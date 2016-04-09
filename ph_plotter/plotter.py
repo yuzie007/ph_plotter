@@ -79,7 +79,9 @@ class Plotter(object):
             "font.family": "Arial",
             "font.size": fontsize,
             "mathtext.fontset": "custom",
-            "mathtext.it": "Arial"}
+            "mathtext.it": "Arial",
+            "legend.fontsize": fontsize,
+        }
         plt.rcParams.update(params)
 
         fig, ax = plt.subplots(
