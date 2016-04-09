@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division,
 __author__ = "Yuji Ikeda"
 
 import os
+import matplotlib.pyplot as plt
 from units import THz2meV
 
 
@@ -64,8 +65,36 @@ class Plotter(object):
     def load_data(self):
         raise NotImplementedError
 
-    def plot(self):
+    def plot(self, ax):
         raise NotImplementedError
+
+    def create_figure_name(self):
+        raise NotImplementedError
+
+    def create_figure(self):
+        variables = self._variables
+
+        fontsize = 12
+        params = {
+            "font.family": "Arial",
+            "font.size": fontsize,
+            "mathtext.fontset": "custom",
+            "mathtext.it": "Arial"}
+        plt.rcParams.update(params)
+
+        fig, ax = plt.subplots(
+            1, 1,
+            figsize=variables["figsize"],
+            frameon=False,
+            tight_layout=True)
+
+        self.plot(ax)
+
+        figure_name = self.create_figure_name()
+        self.save_figure(fig, figure_name)
+
+    def save_figure(self, fig, figure_name):
+        fig.savefig(figure_name, transparent=True)
 
     def run(self):
 
@@ -78,7 +107,7 @@ class Plotter(object):
             "unit": 1.0,
         })
         self.update_variables(variables)
-        self.plot()
+        self.create_figure()
 
         # meV
         variables.update({
@@ -90,7 +119,7 @@ class Plotter(object):
         variables["f_max"]  *= scale
         variables["d_freq"] *= scale
         self.update_variables(variables)
-        self.plot()
+        self.create_figure()
 
     def create_primitive(self, filename="POSCAR"):
         from phonopy.structure.cells import get_primitive

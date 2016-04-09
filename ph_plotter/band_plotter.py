@@ -5,7 +5,6 @@ from __future__ import absolute_import, print_function
 __author__ = "Yuji Ikeda"
 
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 from .plotter import Plotter, read_band_labels
 
@@ -46,7 +45,7 @@ class BandPlotter(Plotter):
 
         return self
 
-    def plot(self):
+    def plot(self, ax):
         variables = self._variables
 
         distances = self._distances
@@ -58,41 +57,27 @@ class BandPlotter(Plotter):
         f_max = variables["f_max"]
         n_freq = int((f_max - f_min) / d_freq) + 1
 
-        fontsize = 12
-        params = {
-            "font.family": "Arial",
-            "font.size": fontsize,
-            "mathtext.fontset": "custom",
-            "mathtext.it": "Arial",
-        }
-        plt.rcParams.update(params)
-
-        plt.figure(
-            figsize=variables["figsize"],
-            frameon=False,
-            tight_layout=True,
-        )
-
         ml = AutoMinorLocator(2)
-        plt.axes().yaxis.set_minor_locator(ml)
+        ax.yaxis.set_minor_locator(ml)
 
-        plt.xticks([0.0] + list(distances[:, -1]), self._band_labels)
-        plt.xlabel("Wave vector")
-        plt.xlim(distances[0, 0], distances[-1, -1])
+        ax.set_xticks([0.0] + list(distances[:, -1]))
+        ax.set_xticklabels(self._band_labels)
+        ax.set_xlabel("Wave vector")
+        ax.set_xlim(distances[0, 0], distances[-1, -1])
 
-        plt.yticks(np.linspace(f_min, f_max, n_freq))
-        plt.ylabel(freq_label)
-        plt.ylim(f_min, f_max)
+        ax.set_yticks(np.linspace(f_min, f_max, n_freq))
+        ax.set_ylabel(freq_label)
+        ax.set_ylim(f_min, f_max)
 
         for x in [0.0] + list(distances[:, -1]):
-            plt.axvline(x, color="k", dashes=(2, 2), linewidth=0.5)
+            ax.axvline(x, color="k", dashes=(2, 2), linewidth=0.5)
         # for y in np.linspace(f_min, f_max, n_freq):
         #     plt.axhline(y, color="#000000", linestyle=":")
-        plt.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
+        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
 
         npath, nqpoint, nband = frequencies.shape
         for ipath in range(npath):
-            lines = plt.plot(
+            lines = ax.plot(
                 distances[ipath],
                 frequencies[ipath] * variables["unit"],
                 variables["linecolor"],
@@ -100,9 +85,9 @@ class BandPlotter(Plotter):
                 linewidth=variables["linewidth"],
             )
 
+    def create_figure_name(self):
+        variables = self._variables
         figure_name = "band_{}.{}".format(
             variables["freq_unit"],
-            variables["figure_type"],
-        )
-        plt.savefig(figure_name, transparent=True)
-        plt.close()
+            variables["figure_type"])
+        return figure_name
