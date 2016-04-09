@@ -121,11 +121,11 @@ class BandDensityPlotter(Plotter):
             "_w_bar." + variables["figure_type"])
         fig.savefig(figure_name_w_bar, dpi=288, transparent=True)
 
-    def create_colorbar(self, fig):
+    def create_colorbar(self, fig, ax=None):
         variables = self._variables
 
         # Plot colorbar only.
-        colorbar = fig.colorbar(self._quad_mesh, extend="both")
+        colorbar = fig.colorbar(self._quad_mesh, ax=ax, extend="both")
         colorbar_label = "Spectral function (/{})".format(variables["freq_unit"])
         colorbar.set_label(
             colorbar_label,
