@@ -1,0 +1,125 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+
+__author__ = "Yuji Ikeda"
+
+import os
+from units import THz2meV
+
+
+def read_primitive_matrix(phonopy_conf):
+    from phonopy.cui.settings import PhonopyConfParser
+
+    settings = PhonopyConfParser(phonopy_conf, option_list=[]).get_settings()
+    return settings.get_primitive_matrix()
+
+
+def read_band_labels(phonopy_conf):
+    from phonopy.cui.settings import PhonopyConfParser
+
+    settings = PhonopyConfParser(phonopy_conf, option_list=[]).get_settings()
+    band_labels = settings.get_band_labels()
+    gamma_str = r"\Gamma"
+    for i, band_label in enumerate(band_labels):
+        band_labels[i] = band_label.replace(gamma_str, u"Γ")
+    band_labels = tuple(band_labels)
+    return band_labels
+
+
+class Plotter(object):
+    def __init__(self, variables=None):
+        if variables is None:
+            variables = {}
+        self._variables = {
+            "freq_unit": "THz",
+            "unit": 1.0,
+            "f_min": -2.5,
+            "f_max": 10.0,
+            "d_freq": 2.5,
+            "linestyle": "-",
+            "dashes": (),
+            "linewidth": 1,
+            "linecolor": "#ff0000",
+            "alpha": 0.2,
+            "figure_type": "pdf",
+            "figsize": (5.0, 3.5),
+            "poscar": "POSCAR",
+            "xticks_label": [],
+            "sf_min": 0.0,
+            "sf_max": 2.0,
+            "d_sf": 0.5,
+        }
+        self._variables.update(variables)
+
+        self._is_horizontal = False
+        self._plot_atom = True
+        self._plot_symbol = True
+        self._plot_total = True
+
+    def update_variables(self, variables):
+        self._variables.update(variables)
+
+    def load_data(self):
+        raise NotImplementedError
+
+    def plot(self):
+        raise NotImplementedError
+
+    def run(self):
+
+        variables = self._variables
+
+        self.load_data(variables["data_file"])
+
+        variables.update({
+            "freq_unit": "THz",
+            "unit": 1.0,
+        })
+        self.update_variables(variables)
+        self.plot()
+
+        # meV
+        variables.update({
+            "freq_unit": "meV",
+            "unit": THz2meV,
+        })
+        scale = 4.0
+        variables["f_min"]  *= scale
+        variables["f_max"]  *= scale
+        variables["d_freq"] *= scale
+        self.update_variables(variables)
+        self.plot()
+
+    def create_primitive(self, filename="POSCAR"):
+        from phonopy.structure.cells import get_primitive
+        from phonopy.interface.vasp import read_vasp
+        primitive_matrix = self._read_primitive_matrix()
+        atoms = read_vasp(filename)
+        return get_primitive(atoms, primitive_matrix)
+
+    def _read_primitive_matrix(self):
+        from phonopy.cui.settings import PhonopyConfParser
+        self._check_conf_files()
+        phonopy_conf_parser = PhonopyConfParser(
+            self._conf_file,
+            option_list=[],
+        )
+        primitive_matrix = (
+            phonopy_conf_parser.get_settings().get_primitive_matrix()
+        )
+        return primitive_matrix
+
+    def _check_conf_files(self):
+        conf_files = [
+            "band.conf",
+            "dos_smearing.conf",
+            "dos_tetrahedron.conf",
+            "partial_dos_smearing.conf",
+            "partial_dos_tetrahedron.conf",
+        ]
+        for conf_file in conf_files:
+            if os.path.isfile(conf_file):
+                self._conf_file = conf_file
+                return
