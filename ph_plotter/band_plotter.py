@@ -1,33 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
 
 __author__ = "Yuji Ikeda"
 
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from .plotter import Plotter, read_band_labels
-
-
-def read_band_yaml(yaml_file="band.yaml"):
-    import yaml
-    data = yaml.load(open(yaml_file, "r"))
-    nqpoint = data['nqpoint']
-    npath = data['npath']
-    natom = data['natom']
-    nband = natom * 3
-    nsep = nqpoint // npath
-    distance = np.zeros((npath, nsep))
-    frequency = np.zeros((npath, nsep, nband))
-    for ipath in range(npath):
-        for isep in range(nsep):
-            iq = ipath * nsep + isep
-            distance[ipath, isep] = data['phonon'][iq]['distance']
-            for iband in range(nband):
-                frequency[ipath, isep, iband] = (
-                    data['phonon'][iq]['band'][iband]['frequency']
-                )
-    return distance, frequency
+from .file_io import read_band_yaml
 
 
 class BandPlotter(Plotter):
@@ -72,7 +53,7 @@ class BandPlotter(Plotter):
         for x in [0.0] + list(distances[:, -1]):
             ax.axvline(x, color="k", dashes=(2, 2), linewidth=0.5)
         # for y in np.linspace(f_min, f_max, n_freq):
-        #     plt.axhline(y, color="#000000", linestyle=":")
+        #     ax.axhline(y, color="#000000", linestyle=":")
         ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
 
         npath, nqpoint, nband = frequencies.shape
