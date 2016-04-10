@@ -93,6 +93,7 @@ class Plotter(object):
 
         figure_name = self.create_figure_name()
         self.save_figure(fig, figure_name)
+        plt.close()
 
     def save_figure(self, fig, figure_name):
         fig.savefig(figure_name, transparent=True)
