@@ -23,7 +23,11 @@ class DOSPlotter(Plotter):
     def plot(self, ax):
         self.prepare(ax)
         if self._plot_total:
-            self.plot_dos_total(ax)
+            figure_name = self.create_figure_name()
+            lines = self.plot_dos_total(ax)
+            fig = ax.get_figure()
+            self.save_figure_dos_total(fig, figure_name)
+            lines[0].remove()
         if self._plot_symbol:
             self.plot_dos_symbol(ax)
         if self._plot_atom:
@@ -102,10 +106,10 @@ class DOSPlotter(Plotter):
             dashes=variables["dashes"],
             linewidth=variables["linewidth"],
         )
-        figure_name = self.create_figure_name()
-        fig = ax.get_figure()
+        return lines
+
+    def save_figure_dos_total(self, fig, figure_name):
         fig.savefig(figure_name, transparent=True)
-        lines[0].remove()
 
     def save_figure(self, fig, figure_name):
         # Since so far DOSPlotter saves the figure at the same time as
