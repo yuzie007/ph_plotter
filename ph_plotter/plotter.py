@@ -117,6 +117,8 @@ class Plotter(object):
         self.update_variables(variables)
         self.create_figure()
 
+        return
+
         # meV
         variables.update({
             "freq_unit": "meV",
