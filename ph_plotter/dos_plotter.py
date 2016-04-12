@@ -72,14 +72,14 @@ class DOSPlotter(Plotter):
         d_freq = variables["d_freq"]
         f_min = variables["f_min"]
         f_max = variables["f_max"]
-        n_freq = int((f_max - f_min) / d_freq) + 1
+        n_freq = round((f_max - f_min) / d_freq) + 1
 
         dos_label  = "Phonon DOS (/{})".format(variables["freq_unit"])
         dos_min   = variables["dos_min"]
         dos_max   = variables["dos_max"]
         dos_ticks = variables["dos_ticks"]
         # Add 1 to include end points
-        nticks_dos = int((dos_max - dos_min) / dos_ticks) + 1
+        nticks_dos = round((dos_max - dos_min) / dos_ticks) + 1
 
         mlx = AutoMinorLocator(2)
         ax.xaxis.set_minor_locator(mlx)
