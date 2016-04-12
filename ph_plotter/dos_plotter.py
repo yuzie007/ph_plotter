@@ -100,6 +100,7 @@ class DOSPlotter(Plotter):
             self._frequencies * variables["unit"],
             variables["linecolor"],
             dashes=variables["dashes"],
+            linewidth=variables["linewidth"],
         )
         figure_name = self.create_figure_name()
         fig = ax.get_figure()
@@ -125,6 +126,7 @@ class DOSPlotter(Plotter):
                 self._frequencies * variables["unit"],
                 variables["linecolor"],
                 dashes=variables["dashes"],
+                linewidth=variables["linewidth"],
             )
             figure_name = self.create_figure_name(symbol=s)
             fig = ax.get_figure()
@@ -143,6 +145,7 @@ class DOSPlotter(Plotter):
                 self._frequencies * variables["unit"],
                 variables["linecolor"],
                 dashes=variables["dashes"],
+                linewidth=variables["linewidth"],
             )
             pdf.savefig(transparent=True)
             lines[0].remove()
