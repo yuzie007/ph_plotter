@@ -13,19 +13,8 @@ class PartialDOSPlotter(DOSPlotter):
     def __init__(self, variables=None):
         if variables is None:
             variables = {}
-        self._variables = {
-            "f_min": -2.5,
-            "f_max": 10.0,
-            "d_freq": 2.5,
-            "dos_min": 0.0,
-            "dos_max": 0.4,
-            "dos_ticks": 0.1,
-            "dashes": (),
-            "alpha": 0.2,
-            "figure_type": "pdf",
-            "figsize": (5.0, 3.5),
-            "data_file": "partial_dos.dat",
-        }
+        self._create_default_variables()
+        self.update_variables({"data_file": "partial_dos.dat"})
         self.update_variables(variables)
 
         self._is_horizontal = False

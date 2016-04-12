@@ -33,12 +33,24 @@ class Plotter(object):
     def __init__(self, variables=None):
         if variables is None:
             variables = {}
+        self._create_default_variables()
+        self.update_variables(variables)
+
+        self._is_horizontal = False
+        self._plot_atom = True
+        self._plot_symbol = True
+        self._plot_total = True
+
+    def _create_default_variables(self):
         self._variables = {
             "freq_unit": "THz",
             "unit": 1.0,
             "f_min": -2.5,
             "f_max": 10.0,
             "d_freq": 2.5,
+            "dos_min": 0.0,
+            "dos_max": 0.4,
+            "dos_ticks": 0.1,
             "sf_min": 0.0,
             "sf_max": 2.0,
             "d_sf": 0.5,
@@ -51,12 +63,6 @@ class Plotter(object):
             "alpha": 0.2,
             "poscar": "POSCAR",
         }
-        self._variables.update(variables)
-
-        self._is_horizontal = False
-        self._plot_atom = True
-        self._plot_symbol = True
-        self._plot_total = True
 
     def update_variables(self, variables):
         self._variables.update(variables)
