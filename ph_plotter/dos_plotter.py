@@ -13,8 +13,8 @@ from .plotter import Plotter
 
 
 class DOSPlotter(Plotter):
-    def load_data(self, filename):
-        data = np.loadtxt(filename).T
+    def load_data(self, data_file):
+        data = np.loadtxt(data_file).T
         print(np.sum(data[1]))
         self._frequencies = data[0]
         self._dos_list = data[1:]
