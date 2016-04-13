@@ -99,13 +99,14 @@ class ColormapCreator(object):
     def create_colormap(self, colorname="red", alpha=1.0, ncolor=10):
         from matplotlib.colors import ColorConverter
 
-        color_tuple = ColorConverter().to_rgba(colorname)
+        color_array = ColorConverter().to_rgba(colorname)
+        color_array = np.array(color_array)
 
         color_list = np.zeros((ncolor, 4))
-        white = np.array((1.0, 1.0, 1.0, alpha))
-        diff = (np.array(color_tuple) - white) / ncolor
+        white_array = np.array((1.0, 1.0, 1.0, alpha))
+        diff = (color_array - white_array) / ncolor
         for i in range(ncolor):
-            color_list[i] = white + diff * i
+            color_list[i] = white_array + diff * i
 
         # Transparent
         color_list[0] = [0.0, 0.0, 0.0, 0.0]
@@ -115,5 +116,5 @@ class ColormapCreator(object):
 
         cmap = ListedColormap(color_list)
         cmap.set_under(color_list[0])
-        cmap.set_over(color_tuple)
+        cmap.set_over(color_array)
         return cmap
