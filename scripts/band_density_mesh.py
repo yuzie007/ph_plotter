@@ -30,6 +30,10 @@ def main():
                         default="#ff0000",
                         type=str,
                         help="Linecolor.")
+    parser.add_argument("--colormap",
+                        default="r",
+                        type=str,
+                        help="Colors of the colormap.")
     parser.add_argument("-a", "--alpha",
                         default=0.2,
                         type=float,
@@ -56,10 +60,6 @@ def main():
                         default="band.hdf5",
                         type=str,
                         help="Filename of data.")
-    parser.add_argument("--colormap",
-                        default="red",
-                        type=str,
-                        help="Colormap type.")
     args = parser.parse_args()
 
     print(vars(args))

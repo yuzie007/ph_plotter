@@ -81,11 +81,17 @@ class BandDensityPlotter(Plotter):
         #     ax.axhline(y, color="#000000", linestyle=":")
         ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
 
-        self._colormap = ColormapCreator().create_colormap(
-            colorname=variables["colormap"], alpha=variables["alpha"])
-        # "pcolormesh" is much faster than "pcolor".
         sf_min = variables["sf_min"]
         sf_max = variables["sf_max"]
+        d_sf = variables["d_sf"]
+        n_sf = int(round(sf_max / d_sf))
+        self._sf_ticks = np.linspace(sf_min, sf_max, n_sf + 1)
+
+        self._colormap = ColormapCreator().create_colormap(
+            colorname=variables["colormap"],
+            alpha=variables["alpha"],
+            ncolor=n_sf)
+        # "pcolormesh" is much faster than "pcolor".
         quad_mesh = ax.pcolormesh(
             self._xs / self._distances[-1, -1],  # normalization
             self._ys * variables["unit"],
@@ -124,10 +130,10 @@ class BandDensityPlotter(Plotter):
     def create_colorbar(self, fig, ax=None):
         variables = self._variables
 
-        # Plot colorbar only.
-        colorbar = fig.colorbar(self._quad_mesh, ax=ax, extend="both")
-        colorbar_label = "Spectral function (/{})".format(variables["freq_unit"])
+        colorbar = fig.colorbar(
+            self._quad_mesh, ax=ax, extend="both", ticks=self._sf_ticks)
+        cb_label = "Spectral function (/{})".format(variables["freq_unit"])
         colorbar.set_label(
-            colorbar_label,
+            cb_label,
             verticalalignment="baseline",
             rotation=-90)

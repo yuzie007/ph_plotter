@@ -95,24 +95,25 @@ def get_colormap_2(alpha=0.2):
     return cmap
 
 
-def get_colormap(colorname="red", alpha=0.2):
-    color_list = []
-    values = [1.00, 0.90, 0.80, 0.70, 0.65, 0.60, 0.55, 0.50, 0.45, 0.40]
-    if colorname == "red":
-        for v in values:
-            color_list.append([1.0, v, v])
-            cmap = ListedColormap(color_list)
-            cmap.set_under((1.0, 1.0, 1.0))
-            cmap.set_over ((1.0, 0.0, 0.0))
-    elif colorname == "blue":
-        for v in values:
-            color_list.append([v, v, 1.0])
-            cmap = ListedColormap(color_list)
-            cmap.set_under((1.0, 1.0, 1.0))
-            cmap.set_over ((0.0, 0.0, 1.0))
-    return cmap
-
-
 class ColormapCreator(object):
-    def create_colormap(self, colorname="red", alpha=0.2):
-        return get_colormap(colorname, alpha)
+    def create_colormap(self, colorname="red", alpha=1.0, ncolor=10):
+        from matplotlib.colors import ColorConverter
+
+        color_tuple = ColorConverter().to_rgba(colorname)
+
+        color_list = np.zeros((ncolor, 4))
+        white = np.array((1.0, 1.0, 1.0, alpha))
+        diff = (np.array(color_tuple) - white) / ncolor
+        for i in range(ncolor):
+            color_list[i] = white + diff * i
+
+        # Transparent
+        color_list[0] = [0.0, 0.0, 0.0, 0.0]
+
+        print("color_list:")
+        print(color_list)
+
+        cmap = ListedColormap(color_list)
+        cmap.set_under(color_list[0])
+        cmap.set_over(color_tuple)
+        return cmap
