@@ -35,7 +35,7 @@ def main():
                         type=str,
                         help="Colors of the colormap.")
     parser.add_argument("-a", "--alpha",
-                        default=0.2,
+                        default=1.0,
                         type=float,
                         help="Alpha for the color of low-frequency weights.")
     parser.add_argument("--sf_max",
