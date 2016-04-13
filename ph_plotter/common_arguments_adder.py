@@ -21,12 +21,15 @@ class CommonArgumentsAdder(object):
                             type=float,
                             help="Pitch for frequency (THz).")
         parser.add_argument("--sf_max",
+                            default=2.0,
                             type=float,
                             help="Maximum of spectral functions.")
         parser.add_argument("--sf_min",
+                            default=0.0,
                             type=float,
                             help="Minimum of spectral functions.")
         parser.add_argument("--d_sf",
+                            default=0.5,
                             type=float,
                             help="Ticks of spectral functions.")
         parser.add_argument("--linecolor",
