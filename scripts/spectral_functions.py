@@ -34,6 +34,15 @@ def main():
                         default=0.2,
                         type=float,
                         help="Alpha for the color of low-frequency weights.")
+    parser.add_argument("--sf_max",
+                        type=float,
+                        help="Maximum of spectral functions.")
+    parser.add_argument("--sf_min",
+                        type=float,
+                        help="Minimum of spectral functions.")
+    parser.add_argument("--d_sf",
+                        type=float,
+                        help="Ticks of spectral functions.")
     parser.add_argument("-t", "--figure_type",
                         default="pdf",
                         type=str,
