@@ -26,20 +26,16 @@ class BandPlotter(Plotter):
 
         return self
 
-    def plot(self, ax):
+    def configure(self, ax):
         variables = self._variables
 
         distances = self._distances
-        frequencies = self._frequencies
 
         freq_label = "Frequency ({})".format(variables["freq_unit"])
         d_freq = variables["d_freq"]
         f_min = variables["f_min"]
         f_max = variables["f_max"]
-        n_freq = int((f_max - f_min) / d_freq) + 1
-
-        ml = AutoMinorLocator(2)
-        ax.yaxis.set_minor_locator(ml)
+        n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
         ax.set_xticks([0.0] + list(distances[:, -1]))
         ax.set_xticklabels(self._band_labels)
@@ -50,11 +46,20 @@ class BandPlotter(Plotter):
         ax.set_ylabel(freq_label)
         ax.set_ylim(f_min, f_max)
 
+        mly = AutoMinorLocator(2)
+        ax.yaxis.set_minor_locator(mly)
+
         for x in [0.0] + list(distances[:, -1]):
             ax.axvline(x, color="k", dashes=(2, 2), linewidth=0.5)
         # for y in np.linspace(f_min, f_max, n_freq):
         #     ax.axhline(y, color="#000000", linestyle=":")
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
+        # zero axis
+        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
+
+    def plot(self, ax):
+        variables = self._variables
+        distances = self._distances
+        frequencies = self._frequencies
 
         npath, nqpoint, nband = frequencies.shape
         for ipath in range(npath):
