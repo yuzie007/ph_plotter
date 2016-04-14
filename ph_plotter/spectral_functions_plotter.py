@@ -46,7 +46,7 @@ class SpectralFunctionsPlotter(Plotter):
         else:
             self._partial_density = None
 
-    def plot(self, ax):
+    def configure(self, ax):
         variables = self._variables
 
         self.create_list_symbol_indices()
@@ -55,63 +55,104 @@ class SpectralFunctionsPlotter(Plotter):
         d_freq = variables["d_freq"]
         f_min = variables["f_min"]
         f_max = variables["f_max"]
-        n_freq = round((f_max - f_min) / d_freq) + 1
+        n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
-        mlx = AutoMinorLocator(2)
-        ax.xaxis.set_minor_locator(mlx)
-
-        ax.set_xticks(np.linspace(f_min, f_max, n_freq))
-        ax.set_xlabel(freq_label)
-        ax.set_xlim(f_min, f_max)
-
-        mly = AutoMinorLocator(2)
-        ax.yaxis.set_minor_locator(mly)
-
+        sf_label = "Spectral function (/{})".format(variables["freq_unit"])
         sf_min = variables["sf_min"]
         sf_max = variables["sf_max"]
         d_sf = variables["d_sf"]
-        n_sf = int(sf_max / float(d_sf))
-        ax.set_yticks(np.linspace(sf_min, sf_max, n_sf + 1))
-        ax.set_ylabel("Spectral function (/{})".format(variables["freq_unit"]))
-        ax.set_ylim(sf_min - d_sf * 0.25, sf_max)
+        nticks_sf = int(sf_max / float(d_sf)) + 1
 
+        mlx = AutoMinorLocator(2)
+        ax.xaxis.set_minor_locator(mlx)
+        mly = AutoMinorLocator(2)
+        ax.yaxis.set_minor_locator(mly)
+
+        # zero axis
         ax.axvline(0, color="k", dashes=(2, 2), linewidth=0.5)
+        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
 
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
+        if self._is_horizontal:
 
+            ax.set_xticks(np.linspace(f_min, f_max, n_freq))
+            ax.set_xlabel(freq_label)
+            ax.set_xlim(f_min, f_max)
+
+            ax.set_yticks(np.linspace(sf_min, sf_max, nticks_sf))
+            ax.set_ylabel(sf_label)
+            ax.set_ylim(sf_min, sf_max)
+
+        else:
+
+            ax.set_yticks(np.linspace(f_min, f_max, n_freq))
+            ax.set_ylabel(freq_label)
+            ax.set_ylim(f_min, f_max)
+
+            ax.set_xticks(np.linspace(sf_min, sf_max, nticks_sf))
+            ax.set_xlabel(sf_label)
+            ax.set_xlim(sf_min, sf_max)
+
+    def plot(self, ax):
         figure_name = self.create_figure_name()
-        pdf = PdfPages(figure_name)
-        for i, x in enumerate(self._xs):
-            print(i)
-            lines = ax.plot(
-                self._ys[i] * variables["unit"],
-                self._zs[i],
+        with PdfPages(figure_name) as pdf:
+            for iq, x in enumerate(self._xs):
+                print(iq)
+                lines_total, lines_symbols = self.plot_q(ax, iq)
+                ax.legend(framealpha=0.5)
+                pdf.savefig(dpi=288, transparent=True)
+                lines_total[0].remove()
+                for lines in lines_symbols:
+                    lines[0].remove()
+
+    def plot_q(self, ax, iq):
+        lines_total = self.plot_total_q(ax, iq)
+        lines_symbols = self.plot_symbols_q(ax, iq)
+        return lines_total, lines_symbols
+
+    def plot_total_q(self, ax, iq):
+        variables = self._variables
+        if self._is_horizontal:
+            lines_total = ax.plot(
+                self._ys[iq] * variables["unit"],
+                self._zs[iq],
                 color=variables["linecolor"],
                 dashes=variables["dashes"],
                 label="Total",
             )
-            lines_symbols = self.plot_symbol(ax, i)
-            ax.legend(framealpha=0.5)
-            pdf.savefig(dpi=288, transparent=True)
-            lines[0].remove()
-            for lines in lines_symbols:
-                lines[0].remove()
-        pdf.close()
+        else:
+            lines_total = ax.plot(
+                self._zs[iq],
+                self._ys[iq] * variables["unit"],
+                color=variables["linecolor"],
+                dashes=variables["dashes"],
+                label="Total",
+            )
+        return lines_total
 
-    def plot_symbol(self, ax, iq):
+    def plot_symbols_q(self, ax, iq):
         variables = self._variables
         lines_symbols = []
         colors = ("#ff0000", "#0000ff", "#007f00")
         tuple_dashes = ((2, 2), (1, 1), (2, 1))
         for i, symbol_indices in enumerate(self._list_symbol_indices):
             s, indices = symbol_indices
-            lines = ax.plot(
-                self._ys[iq] * variables["unit"],
-                np.sum(self._partial_density[indices, iq], axis=0),
-                color=colors[i],
-                dashes=tuple_dashes[i],
-                label=s,
-            )
+            sf_symbol = np.sum(self._partial_density[indices, iq], axis=0)
+            if self._is_horizontal:
+                lines = ax.plot(
+                    self._ys[iq] * variables["unit"],
+                    sf_symbol,
+                    color=colors[i],
+                    dashes=tuple_dashes[i],
+                    label=s,
+                )
+            else:
+                lines = ax.plot(
+                    sf_symbol,
+                    self._ys[iq] * variables["unit"],
+                    color=colors[i],
+                    dashes=tuple_dashes[i],
+                    label=s,
+                )
             lines_symbols.append(lines)
         return lines_symbols
 

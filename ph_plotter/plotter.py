@@ -30,13 +30,13 @@ def read_band_labels(phonopy_conf):
 
 
 class Plotter(object):
-    def __init__(self, variables=None):
+    def __init__(self, variables=None, is_horizontal=False):
         if variables is None:
             variables = {}
         self._create_default_variables()
         self.update_variables(variables)
 
-        self._is_horizontal = False
+        self._is_horizontal = is_horizontal
         self._plot_atom = True
         self._plot_symbol = True
         self._plot_total = True

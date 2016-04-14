@@ -10,7 +10,7 @@ from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 def run(variables):
     from ph_plotter.spectral_functions_plotter import SpectralFunctionsPlotter
-    SpectralFunctionsPlotter(variables).run()
+    SpectralFunctionsPlotter(variables, is_horizontal=True).run()
 
 
 def main():
