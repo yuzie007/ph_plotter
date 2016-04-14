@@ -6,7 +6,6 @@ from __future__ import (absolute_import, division,
 __author__ = "Yuji Ikeda"
 
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
 from .plotter import Plotter
@@ -21,7 +20,6 @@ class DOSPlotter(Plotter):
         return self
 
     def plot(self, ax):
-        self.prepare(ax)
         if self._plot_total:
             figure_name = self.create_figure_name()
             lines = self.plot_dos_total(ax)
@@ -65,21 +63,21 @@ class DOSPlotter(Plotter):
         )
         return figure_name
 
-    def prepare(self, ax):
+    def configure(self, ax):
         variables = self._variables
 
         freq_label = "Frequency ({})".format(variables["freq_unit"])
         d_freq = variables["d_freq"]
         f_min = variables["f_min"]
         f_max = variables["f_max"]
-        n_freq = round((f_max - f_min) / d_freq) + 1
+        n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
         dos_label  = "Phonon DOS (/{})".format(variables["freq_unit"])
         dos_min   = variables["dos_min"]
         dos_max   = variables["dos_max"]
         dos_ticks = variables["dos_ticks"]
         # Add 1 to include end points
-        nticks_dos = round((dos_max - dos_min) / dos_ticks) + 1
+        nticks_dos = int(round((dos_max - dos_min) / dos_ticks)) + 1
 
         mlx = AutoMinorLocator(2)
         ax.xaxis.set_minor_locator(mlx)
@@ -99,8 +97,9 @@ class DOSPlotter(Plotter):
     def plot_dos_total(self, ax):
         variables = self._variables
 
+        dos_total = np.sum(self._dos_list, axis=0)
         lines = ax.plot(
-            np.sum(self._dos_list, axis=0) / (variables["unit"] * variables["natoms"] * 3),
+            dos_total / (variables["unit"] * variables["natoms"] * 3),
             self._frequencies * variables["unit"],
             variables["linecolor"],
             dashes=variables["dashes"],
@@ -125,8 +124,9 @@ class DOSPlotter(Plotter):
         for i, s in enumerate(reduced_symbols):
             indices = [i for i, x in enumerate(symbols) if x == s]
             print(indices)
+            dos_symbol = np.sum(self._dos_list[indices], axis=0)
             lines = ax.plot(
-                np.sum(self._dos_list[indices], axis=0) / (variables["unit"] * variables["natoms"] * 3),
+                dos_symbol / (variables["unit"] * variables["natoms"] * 3),
                 self._frequencies * variables["unit"],
                 variables["linecolor"],
                 dashes=variables["dashes"],
@@ -141,16 +141,15 @@ class DOSPlotter(Plotter):
         variables = self._variables
 
         figure_name = self.create_figure_name(is_atom=True)
-        pdf = PdfPages(figure_name)
-        for i, dos in enumerate(self._dos_list):
-            print(i)
-            lines = ax.plot(
-                self._dos_list[i] / (variables["unit"] * variables["natoms"] * 3),
-                self._frequencies * variables["unit"],
-                variables["linecolor"],
-                dashes=variables["dashes"],
-                linewidth=variables["linewidth"],
-            )
-            pdf.savefig(transparent=True)
-            lines[0].remove()
-        pdf.close()
+        with PdfPages(figure_name) as pdf:
+            for i, dos_atom in enumerate(self._dos_list):
+                print(i)
+                lines = ax.plot(
+                    dos_atom / (variables["unit"] * variables["natoms"] * 3),
+                    self._frequencies * variables["unit"],
+                    variables["linecolor"],
+                    dashes=variables["dashes"],
+                    linewidth=variables["linewidth"],
+                )
+                pdf.savefig(transparent=True)
+                lines[0].remove()

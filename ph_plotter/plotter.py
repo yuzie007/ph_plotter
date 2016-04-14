@@ -70,6 +70,9 @@ class Plotter(object):
     def load_data(self):
         raise NotImplementedError
 
+    def configure(self, ax):
+        pass
+
     def plot(self, ax):
         raise NotImplementedError
 
@@ -95,6 +98,7 @@ class Plotter(object):
             frameon=False,
             tight_layout=True)
 
+        self.configure(ax)
         self.plot(ax)
 
         figure_name = self.create_figure_name()
