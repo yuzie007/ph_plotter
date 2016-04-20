@@ -60,7 +60,7 @@ class Plotter(object):
             "linewidth": 1,
             "dashes": (),
             "colormap": "red",
-            "alpha": 0.2,
+            "alpha": 1.0,
             "poscar": "POSCAR",
         }
 
