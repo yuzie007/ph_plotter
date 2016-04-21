@@ -50,7 +50,7 @@ class BandDensityPlotter(Plotter):
         else:
             self._partial_density = None
 
-    def plot(self, ax):
+    def configure(self, ax):
         variables = self._variables
 
         distances = self._distances / self._distances[-1, -1]  # normalization
@@ -61,10 +61,7 @@ class BandDensityPlotter(Plotter):
         d_freq = variables["d_freq"]
         f_min = variables["f_min"]
         f_max = variables["f_max"]
-        n_freq = int((f_max - f_min) / d_freq) + 1
-
-        ml = AutoMinorLocator(2)
-        ax.yaxis.set_minor_locator(ml)
+        n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
         ax.set_xticks([0.0] + list(distances[:, -1]))
         ax.set_xticklabels(self._band_labels)
@@ -75,22 +72,30 @@ class BandDensityPlotter(Plotter):
         ax.set_ylabel(freq_label)
         ax.set_ylim(f_min, f_max)
 
+        sf_min = variables["sf_min"]
+        sf_max = variables["sf_max"]
+        d_sf = variables["d_sf"]
+        nticks_sf = int(round(sf_max / d_sf))
+        self._sf_ticks = np.linspace(sf_min, sf_max, nticks_sf + 1)
+
+        mly = AutoMinorLocator(2)
+        ax.yaxis.set_minor_locator(mly)
+
         for x in [0.0] + list(distances[:, -1]):
             ax.axvline(x, color="k", dashes=(2, 2), linewidth=0.5)
         # for y in np.linspace(f_min, f_max, n_freq):
         #     ax.axhline(y, color="#000000", linestyle=":")
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
-
-        sf_min = variables["sf_min"]
-        sf_max = variables["sf_max"]
-        d_sf = variables["d_sf"]
-        n_sf = int(round(sf_max / d_sf))
-        self._sf_ticks = np.linspace(sf_min, sf_max, n_sf + 1)
+        # zero axis
+        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
 
         self._colormap = ColormapCreator().create_colormap(
             colorname=variables["colormap"],
             alpha=variables["alpha"],
-            ncolor=n_sf)
+            ncolor=nticks_sf)
+
+    def plot(self, ax):
+        variables = self._variables
+
         # "pcolormesh" is much faster than "pcolor".
         PC = ax.contourf(
             self._xs / self._distances[-1, -1],  # normalization
