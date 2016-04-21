@@ -84,8 +84,8 @@ class BandDensityPlotter(Plotter):
             self._ys * variables["unit"],
             self._zs,
             cmap=self._colormap,
-            vmin=sf_min,
-            vmax=sf_max,
+            vmin=variables["sf_min"],
+            vmax=variables["sf_max"],
             levels=self._sf_ticks,
             extend="both",
             # rasterized=True,  # This is important to make the figure light.
