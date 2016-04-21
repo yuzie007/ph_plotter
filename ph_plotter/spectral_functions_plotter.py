@@ -24,27 +24,9 @@ class SpectralFunctionsPlotter(Plotter):
         self._nstars = nstars
 
         density_datafile = data_file.replace("band.hdf5", "density.dat")
-        self.load_density(density_datafile)
+        self.load_spectral_functions(density_datafile)
 
         return self
-
-    def load_density(self, filename="density.dat"):
-        tmp = np.loadtxt(filename).T
-        xs = tmp[0]
-        ys = tmp[1]
-        zs = tmp[2]
-        n1, n2 = self._distances.shape
-        n = n1 * n2
-        self._xs = xs.reshape(n, -1)
-        self._ys = ys.reshape(n, -1)
-        self._zs = zs.reshape(n, -1)
-
-        if len(tmp) > 3:
-            partial_density = tmp[3:]
-            ncol = len(partial_density)
-            self._partial_density = partial_density.reshape(ncol, n, -1)
-        else:
-            self._partial_density = None
 
     def configure(self, ax):
         variables = self._variables

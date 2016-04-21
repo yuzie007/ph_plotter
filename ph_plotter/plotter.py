@@ -70,6 +70,26 @@ class Plotter(object):
     def load_data(self):
         raise NotImplementedError
 
+    def load_spectral_functions(self, filename="density.dat"):
+        import pandas as pd
+        tmp = pd.read_table(filename, delim_whitespace=True, header=None)
+        tmp = tmp.as_matrix().T
+        xs = tmp[0]
+        ys = tmp[1]
+        zs = tmp[2]
+        n1, n2 = self._distances.shape
+        n = n1 * n2
+        self._xs = xs.reshape(n, -1)
+        self._ys = ys.reshape(n, -1)
+        self._zs = zs.reshape(n, -1)
+
+        if len(tmp) > 3:
+            partial_density = tmp[3:]
+            ncol = len(partial_density)
+            self._partial_density = partial_density.reshape(ncol, n, -1)
+        else:
+            self._partial_density = None
+
     def configure(self, ax):
         pass
 
