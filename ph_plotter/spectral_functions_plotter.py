@@ -23,8 +23,8 @@ class SpectralFunctionsPlotter(Plotter):
         self._pr_weights = pr_weights
         self._nstars = nstars
 
-        density_datafile = data_file.replace("band.hdf5", "density.dat")
-        self.load_spectral_functions(density_datafile)
+        sf_datafile = data_file.replace("band.hdf5", "spectral_functions.dat")
+        self.load_spectral_functions(sf_datafile)
 
         return self
 
