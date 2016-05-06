@@ -44,3 +44,11 @@ def read_band_hdf5(hdf5_file="band.hdf5"):
         pr_weights  = np.array(pr_weights)
 
     return distances, frequencies, pr_weights, nqstars
+
+def read_band_hdf5_dict(hdf5_file="band.hdf5"):
+    import h5py
+    data = {}
+    with h5py.File(hdf5_file, "r") as f:
+        for k, v in f.items():
+            data[k] = np.array(v)
+    return data

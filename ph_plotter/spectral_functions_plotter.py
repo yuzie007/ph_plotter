@@ -9,19 +9,23 @@ import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
 from .plotter import Plotter, read_band_labels
-from .file_io import read_band_hdf5
+from .file_io import read_band_hdf5_dict
 
 
 class SpectralFunctionsPlotter(Plotter):
     def load_data(self, data_file="band.hdf5"):
         print("Reading band.hdf5: ", end="")
-        distances, frequencies, pr_weights, nstars = read_band_hdf5(data_file)
+        data = read_band_hdf5_dict(data_file)
         print("Finished")
 
-        self._distances = distances
-        self._frequencies = frequencies
-        self._pr_weights = pr_weights
-        self._nstars = nstars
+        self._distances   = data["distances"]
+        self._frequencies = data["frequencies"]
+        self._pr_weights  = data["pr_weights"]
+        self._nstars      = data["nqstars"]
+        if "rot_pr_weights" in data:
+            self._rot_pr_weights = data["rot_pr_weights"]
+        if "num_irs" in data:
+            self._num_irs = data["num_irs"]
 
         sf_datafile = data_file.replace("band.hdf5", "spectral_functions.dat")
         self.load_spectral_functions(sf_datafile)
