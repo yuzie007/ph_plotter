@@ -21,6 +21,9 @@ def main():
                         default="band.hdf5",
                         type=str,
                         help="Filename of data.")
+    parser.add_argument("--irs", dest="is_irs",
+                        action="store_true",
+                        help="Plotting for irreduciple representations.")
     args = parser.parse_args()
 
     print(vars(args))

@@ -22,10 +22,15 @@ class SpectralFunctionsPlotter(Plotter):
         self._frequencies = data["frequencies"]
         self._pr_weights  = data["pr_weights"]
         self._nstars      = data["nqstars"]
+
+        n1, n2 = self._distances.shape
+
         if "rot_pr_weights" in data:
             self._rot_pr_weights = data["rot_pr_weights"]
         if "num_irs" in data:
-            self._num_irs = data["num_irs"]
+            self._num_irs = data["num_irs"].reshape(n1 * n2, -1)
+        if "ir_labels" in data:
+            self._ir_labels = data["ir_labels"].reshape(n1 * n2, -1)
 
         sf_datafile = data_file.replace("band.hdf5", "spectral_functions.dat")
         self.load_spectral_functions(sf_datafile)
@@ -92,7 +97,10 @@ class SpectralFunctionsPlotter(Plotter):
 
     def plot_q(self, ax, iq):
         lines_total = self.plot_total_q(ax, iq)
-        lines_symbols = self.plot_symbols_q(ax, iq)
+        if self._variables["is_irs"]:
+            lines_symbols = self.plot_irs_q(ax, iq)
+        else:
+            lines_symbols = self.plot_symbols_q(ax, iq)
         return lines_total, lines_symbols
 
     def plot_total_q(self, ax, iq):
@@ -118,10 +126,9 @@ class SpectralFunctionsPlotter(Plotter):
         return lines_total
 
     def plot_symbols_q(self, ax, iq):
+        from .attributes import colors, tuple_dashes
         variables = self._variables
         lines_symbols = []
-        colors = ("#ff0000", "#0000ff", "#007f00")
-        tuple_dashes = ((2, 1), (1, 1), (2, 1, 1, 1))
         for i, symbol_indices in enumerate(self._list_symbol_indices):
             s, indices = symbol_indices
             sf_symbol = np.sum(self._partial_density[indices, iq], axis=0)
@@ -145,6 +152,42 @@ class SpectralFunctionsPlotter(Plotter):
                 )
             lines_symbols.append(lines)
         return lines_symbols
+
+    def plot_irs_q(self, ax, iq):
+        from .attributes import colors, tuple_dashes
+        variables = self._variables
+        lines_symbols = []
+        indices = self._find_nonzero_irs(iq)
+        for counter, index in enumerate(indices):
+            ir_label = self._ir_labels[iq, index]
+            sf_symbol = self._partial_density[index, iq]
+            if self._is_horizontal:
+                lines = ax.plot(
+                    self._ys[iq] * variables["unit"],
+                    sf_symbol,
+                    color=colors[counter % len(colors)],
+                    dashes=tuple_dashes[counter % len(tuple_dashes)],
+                    linewidth=variables["linewidth"],
+                    label=ir_label,
+                )
+            else:
+                lines = ax.plot(
+                    sf_symbol,
+                    self._ys[iq] * variables["unit"],
+                    color=colors[counter % len(colors)],
+                    dashes=tuple_dashes[counter % len(tuple_dashes)],
+                    linewidth=variables["linewidth"],
+                    label=ir_label,
+                )
+            lines_symbols.append(lines)
+        return lines_symbols
+
+    def _find_nonzero_irs(self, iq, prec=1e-6):
+        num_irs = self._num_irs[iq]
+        indices = np.where(np.sum(self._partial_density[:num_irs, iq], axis=1) > prec)[0]
+        print(np.sum(self._partial_density[:num_irs, iq], axis=1))
+        print(indices)
+        return indices
 
     def create_list_symbol_indices(self):
         from phonopy.interface.vasp import read_vasp
