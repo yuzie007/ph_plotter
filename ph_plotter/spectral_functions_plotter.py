@@ -99,6 +99,7 @@ class SpectralFunctionsPlotter(Plotter):
                 self._zs[iq],
                 color=variables["linecolor"],
                 dashes=variables["dashes"],
+                linewidth=variables["linewidth"],
                 label="Total",
             )
         else:
@@ -107,6 +108,7 @@ class SpectralFunctionsPlotter(Plotter):
                 self._ys[iq] * variables["unit"],
                 color=variables["linecolor"],
                 dashes=variables["dashes"],
+                linewidth=variables["linewidth"],
                 label="Total",
             )
         return lines_total
@@ -115,7 +117,7 @@ class SpectralFunctionsPlotter(Plotter):
         variables = self._variables
         lines_symbols = []
         colors = ("#ff0000", "#0000ff", "#007f00")
-        tuple_dashes = ((2, 2), (1, 1), (2, 1))
+        tuple_dashes = ((2, 1), (1, 1), (2, 1, 1, 1))
         for i, symbol_indices in enumerate(self._list_symbol_indices):
             s, indices = symbol_indices
             sf_symbol = np.sum(self._partial_density[indices, iq], axis=0)
@@ -125,6 +127,7 @@ class SpectralFunctionsPlotter(Plotter):
                     sf_symbol,
                     color=colors[i],
                     dashes=tuple_dashes[i],
+                    linewidth=variables["linewidth"],
                     label=s,
                 )
             else:
@@ -133,6 +136,7 @@ class SpectralFunctionsPlotter(Plotter):
                     self._ys[iq] * variables["unit"],
                     color=colors[i],
                     dashes=tuple_dashes[i],
+                    linewidth=variables["linewidth"],
                     label=s,
                 )
             lines_symbols.append(lines)
