@@ -126,8 +126,9 @@ class Plotter(object):
         params = {
             "font.family": "Arial",
             "font.size": fontsize,
-            "mathtext.fontset": "custom",
-            "mathtext.it": "Arial",
+            # "mathtext.fontset": "custom",
+            # "mathtext.it": "Arial",
+            "mathtext.default": "regular",
             "legend.fontsize": fontsize,
         }
         plt.rcParams.update(params)
