@@ -160,6 +160,7 @@ class SpectralFunctionsPlotter(Plotter):
         indices = self._find_nonzero_irs(iq)
         for counter, index in enumerate(indices):
             ir_label = self._ir_labels[iq, index]
+            ir_label = self._modify_ir_label(ir_label)
             sf_symbol = self._partial_density[index, iq]
             if self._is_horizontal:
                 lines = ax.plot(
@@ -213,3 +214,9 @@ class SpectralFunctionsPlotter(Plotter):
 
     def save_figure(self, fig, figure_name):
         pass
+
+    def _modify_ir_label(self, ir_label):
+        if len(ir_label) == 1:
+            return ir_label
+        else:
+            return ir_label[0] + "$_{{{}}}$".format(ir_label[1:])
