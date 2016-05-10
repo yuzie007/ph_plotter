@@ -25,8 +25,8 @@ class SFElementsPlotter(SpectralFunctionsPlotter):
 
         variables = self._variables
         lines_symbols = []
-        for counter, symbol_indices in enumerate(self._list_symbol_indices):
-            element_label, indices = symbol_indices
+        for counter, element_indices in enumerate(self._list_element_indices):
+            element_label, indices = element_indices
             sf_symbol = np.sum(self._partial_density[indices, iq], axis=0)
 
             if self._is_horizontal:

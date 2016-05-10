@@ -35,12 +35,17 @@ class SpectralFunctionsPlotter(Plotter):
         sf_datafile = self._create_sf_datafile(data_file)
         self.load_spectral_functions(sf_datafile)
 
+        self.create_list_element_indices()
+        # For back-compatibility
+        if self._partial_density.shape[0] == 3 * self._natoms:
+            self._expand_list_element_indices()
+        print("list_element_indices:")
+        print(self._list_element_indices)
+
         return self
 
     def configure(self, ax):
         variables = self._variables
-
-        self.create_list_element_indices()
 
         freq_label = "Frequency ({})".format(variables["freq_unit"])
         d_freq = variables["d_freq"]
@@ -122,16 +127,33 @@ class SpectralFunctionsPlotter(Plotter):
     def create_list_element_indices(self):
         from phonopy.interface.vasp import read_vasp
         filename = self._variables["poscar"]
-        symbols = read_vasp(filename).get_chemical_symbols()
-        symbols3 = [s for s in symbols for i in range(3)]
+        atoms = read_vasp(filename)
+
+        symbols = atoms.get_chemical_symbols()
         reduced_symbols = sorted(set(symbols), key=symbols.index)
-        list_symbol_indices = []
+        list_element_indices = []
         for s in reduced_symbols:
-            indices = [i for i, x in enumerate(symbols3) if x == s]
-            list_symbol_indices.append((s, indices))
-        self._list_symbol_indices = list_symbol_indices
-        print("list_symbol_indices:")
-        print(list_symbol_indices)
+            indices = [i for i, x in enumerate(symbols) if x == s]
+            list_element_indices.append((s, indices))
+
+        self._natoms = atoms.get_number_of_atoms()
+        self._list_element_indices = list_element_indices
+
+    def _expand_list_element_indices(self):
+        list_element_indices = self._list_element_indices
+        ndim = 3
+        expanded_list_element_indices = []
+        for element_indices in list_element_indices:
+            s, indices = element_indices
+
+            indices = np.repeat(indices, ndim)
+            indices *= ndim
+            for i in range(ndim):
+                indices[i::ndim] += i
+
+            expanded_list_element_indices.append((s, indices))
+
+        self._list_element_indices = expanded_list_element_indices
 
     def save_figure(self, fig, figure_name):
         pass
