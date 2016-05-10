@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division,
 
 __author__ = "Yuji Ikeda"
 
+import os
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
@@ -32,7 +33,9 @@ class SpectralFunctionsPlotter(Plotter):
         if "ir_labels" in data:
             self._ir_labels = data["ir_labels"].reshape(n1 * n2, -1)
 
-        sf_datafile = data_file.replace("band.hdf5", "spectral_functions.dat")
+        dirname = os.path.dirname(data_file)
+        sf_with = self._variables["sf_with"]
+        sf_datafile = dirname + "spectral_functions_" + sf_with + ".dat"
         self.load_spectral_functions(sf_datafile)
 
         return self
@@ -97,10 +100,10 @@ class SpectralFunctionsPlotter(Plotter):
 
     def plot_q(self, ax, iq):
         lines_total = self.plot_total_q(ax, iq)
-        if self._variables["is_irs"]:
-            lines_symbols = self.plot_irs_q(ax, iq)
-        else:
+        if self._variables["sf_with"] == "atoms":
             lines_symbols = self.plot_symbols_q(ax, iq)
+        elif self._variables["sf_with"] == "irs":
+            lines_symbols = self.plot_irs_q(ax, iq)
         return lines_total, lines_symbols
 
     def plot_total_q(self, ax, iq):
@@ -185,9 +188,8 @@ class SpectralFunctionsPlotter(Plotter):
 
     def _find_nonzero_irs(self, iq, prec=1e-6):
         num_irs = self._num_irs[iq]
-        indices = np.where(np.sum(self._partial_density[:num_irs, iq], axis=1) > prec)[0]
-        print(np.sum(self._partial_density[:num_irs, iq], axis=1))
-        print(indices)
+        sum_sfs = np.sum(self._partial_density[:num_irs, iq], axis=1)
+        indices = np.where(sum_sfs > prec)[0]
         return indices
 
     def create_list_symbol_indices(self):
@@ -207,7 +209,8 @@ class SpectralFunctionsPlotter(Plotter):
 
     def create_figure_name(self):
         variables = self._variables
-        figure_name = "spectral_functions_{}.{}".format(
+        figure_name = "spectral_functions_{}_{}.{}".format(
+            variables["sf_with"],
             variables["freq_unit"],
             variables["figure_type"])
         return figure_name

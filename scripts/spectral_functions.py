@@ -10,7 +10,7 @@ from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 def run(variables):
     from ph_plotter.spectral_functions_plotter import SpectralFunctionsPlotter
-    SpectralFunctionsPlotter(variables, is_horizontal=True).run()
+    SpectralFunctionsPlotter(variables).run()
 
 
 def main():
@@ -21,9 +21,11 @@ def main():
                         default="band.hdf5",
                         type=str,
                         help="Filename of data.")
-    parser.add_argument("--irs", dest="is_irs",
-                        action="store_true",
-                        help="Plotting for irreduciple representations.")
+    parser.add_argument("--sf_with",
+                        type=str,
+                        choices=["atoms", "irs"],
+                        required=True,
+                        help="To be plotted with the total spectral functions.")
     args = parser.parse_args()
 
     print(vars(args))

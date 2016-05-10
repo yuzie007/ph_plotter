@@ -62,6 +62,7 @@ class Plotter(object):
             "colormap": "red",
             "alpha": 1.0,
             "poscar": "POSCAR",
+            "sf_with": "atoms",
         }
 
     def update_variables(self, variables):
