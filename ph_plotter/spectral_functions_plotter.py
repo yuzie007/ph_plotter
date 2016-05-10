@@ -5,12 +5,11 @@ from __future__ import (absolute_import, division,
 
 __author__ = "Yuji Ikeda"
 
-import os
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
-from .plotter import Plotter, read_band_labels
-from .file_io import read_band_hdf5_dict
+from ph_plotter.plotter import Plotter
+from ph_plotter.file_io import read_band_hdf5_dict
 
 
 class SpectralFunctionsPlotter(Plotter):
@@ -33,9 +32,7 @@ class SpectralFunctionsPlotter(Plotter):
         if "ir_labels" in data:
             self._ir_labels = data["ir_labels"].reshape(n1 * n2, -1)
 
-        dirname = os.path.dirname(data_file)
-        sf_with = self._variables["sf_with"]
-        sf_datafile = dirname + "spectral_functions_" + sf_with + ".dat"
+        sf_datafile = self._create_sf_datafile(data_file)
         self.load_spectral_functions(sf_datafile)
 
         return self
@@ -43,7 +40,7 @@ class SpectralFunctionsPlotter(Plotter):
     def configure(self, ax):
         variables = self._variables
 
-        self.create_list_symbol_indices()
+        self.create_list_element_indices()
 
         freq_label = "Frequency ({})".format(variables["freq_unit"])
         d_freq = variables["d_freq"]
@@ -99,102 +96,31 @@ class SpectralFunctionsPlotter(Plotter):
                     lines[0].remove()
 
     def plot_q(self, ax, iq):
-        lines_total = self.plot_total_q(ax, iq)
-        if self._variables["sf_with"] == "atoms":
-            lines_symbols = self.plot_symbols_q(ax, iq)
-        elif self._variables["sf_with"] == "irs":
-            lines_symbols = self.plot_irs_q(ax, iq)
-        return lines_total, lines_symbols
+        raise NotImplementedError
 
     def plot_total_q(self, ax, iq):
         variables = self._variables
+
         if self._is_horizontal:
-            lines_total = ax.plot(
-                self._ys[iq] * variables["unit"],
-                self._zs[iq],
-                color=variables["linecolor"],
-                dashes=variables["dashes"],
-                linewidth=variables["linewidth"],
-                label="Total",
-            )
+            xs = self._ys[iq] * variables["unit"]
+            ys = self._zs[iq]
         else:
-            lines_total = ax.plot(
-                self._zs[iq],
-                self._ys[iq] * variables["unit"],
-                color=variables["linecolor"],
-                dashes=variables["dashes"],
-                linewidth=variables["linewidth"],
-                label="Total",
-            )
+            xs = self._zs[iq]
+            ys = self._ys[iq] * variables["unit"]
+
+        lines_total = ax.plot(
+            xs,
+            ys,
+            color=variables["linecolor"],
+            dashes=variables["dashes"],
+            linewidth=variables["linewidth"],
+            label="Total",
+        )
+
         return lines_total
 
-    def plot_symbols_q(self, ax, iq):
-        from .attributes import colors, tuple_dashes
-        variables = self._variables
-        lines_symbols = []
-        for i, symbol_indices in enumerate(self._list_symbol_indices):
-            s, indices = symbol_indices
-            sf_symbol = np.sum(self._partial_density[indices, iq], axis=0)
-            if self._is_horizontal:
-                lines = ax.plot(
-                    self._ys[iq] * variables["unit"],
-                    sf_symbol,
-                    color=colors[i],
-                    dashes=tuple_dashes[i],
-                    linewidth=variables["linewidth"],
-                    label=s,
-                )
-            else:
-                lines = ax.plot(
-                    sf_symbol,
-                    self._ys[iq] * variables["unit"],
-                    color=colors[i],
-                    dashes=tuple_dashes[i],
-                    linewidth=variables["linewidth"],
-                    label=s,
-                )
-            lines_symbols.append(lines)
-        return lines_symbols
-
-    def plot_irs_q(self, ax, iq):
-        from .attributes import colors, tuple_dashes
-        variables = self._variables
-        lines_symbols = []
-        indices = self._find_nonzero_irs(iq)
-        for counter, index in enumerate(indices):
-            ir_label = self._ir_labels[iq, index]
-            ir_label = self._modify_ir_label(ir_label)
-            sf_symbol = self._partial_density[index, iq]
-            if self._is_horizontal:
-                lines = ax.plot(
-                    self._ys[iq] * variables["unit"],
-                    sf_symbol,
-                    color=colors[counter % len(colors)],
-                    dashes=tuple_dashes[counter % len(tuple_dashes)],
-                    linewidth=variables["linewidth"],
-                    label=ir_label,
-                )
-            else:
-                lines = ax.plot(
-                    sf_symbol,
-                    self._ys[iq] * variables["unit"],
-                    color=colors[counter % len(colors)],
-                    dashes=tuple_dashes[counter % len(tuple_dashes)],
-                    linewidth=variables["linewidth"],
-                    label=ir_label,
-                )
-            lines_symbols.append(lines)
-        return lines_symbols
-
-    def _find_nonzero_irs(self, iq, prec=1e-6):
-        num_irs = self._num_irs[iq]
-        sum_sfs = np.sum(self._partial_density[:num_irs, iq], axis=1)
-        indices = np.where(sum_sfs > prec)[0]
-        return indices
-
-    def create_list_symbol_indices(self):
+    def create_list_element_indices(self):
         from phonopy.interface.vasp import read_vasp
-        print(self._variables)
         filename = self._variables["poscar"]
         symbols = read_vasp(filename).get_chemical_symbols()
         symbols3 = [s for s in symbols for i in range(3)]
@@ -207,19 +133,5 @@ class SpectralFunctionsPlotter(Plotter):
         print("list_symbol_indices:")
         print(list_symbol_indices)
 
-    def create_figure_name(self):
-        variables = self._variables
-        figure_name = "spectral_functions_{}_{}.{}".format(
-            variables["sf_with"],
-            variables["freq_unit"],
-            variables["figure_type"])
-        return figure_name
-
     def save_figure(self, fig, figure_name):
         pass
-
-    def _modify_ir_label(self, ir_label):
-        if len(ir_label) == 1:
-            return ir_label
-        else:
-            return ir_label[0] + "$_{{{}}}$".format(ir_label[1:])
