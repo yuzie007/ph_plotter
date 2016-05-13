@@ -7,28 +7,42 @@ __author__ = "Yuji Ikeda"
 
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
-from .plotter import Plotter, read_band_labels
-from .file_io import read_band_hdf5
-from .colormap_creator import ColormapCreator
+from ph_plotter.plotter import Plotter, read_band_labels
+from ph_plotter.file_io import read_band_hdf5_dict
+from ph_plotter.colormap_creator import ColormapCreator
 
 
 class BandDensityPlotter(Plotter):
     def load_data(self, data_file="band.hdf5"):
         print("Reading band.hdf5: ", end="")
-        distances, frequencies, pr_weights, nstars = read_band_hdf5(data_file)
+        data = read_band_hdf5_dict(data_file)
         print("Finished")
 
-        self._distances = distances
-        self._frequencies = frequencies
-        self._pr_weights = pr_weights
-        self._nstars = nstars
+        self._distances   = data["distances"]
+        self._frequencies = data["frequencies"]
+        self._pr_weights  = data["pr_weights"]
+        self._nstars      = data["nqstars"]
 
-        sf_datafile = data_file.replace("band.hdf5", "spectral_functions.dat")
+        n1, n2 = self._distances.shape
+
+        if "rot_pr_weights" in data:
+            self._rot_pr_weights = data["rot_pr_weights"]
+        if "num_irs" in data:
+            self._num_irs = data["num_irs"].reshape(n1 * n2, -1)
+        if "ir_labels" in data:
+            self._ir_labels = data["ir_labels"].reshape(n1 * n2, -1)
+
+        sf_datafile = self._create_sf_datafile(data_file)
         self.load_spectral_functions(sf_datafile)
 
         band_labels = read_band_labels("band.conf")
         print("band_labels:", band_labels)
         self._band_labels = band_labels
+
+    def _create_sf_datafile(self, data_file):
+        sf_datafile = data_file.replace(
+            "band.hdf5", "spectral_functions_atoms.dat")
+        return sf_datafile
 
         return self
 
