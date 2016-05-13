@@ -97,12 +97,12 @@ class Plotter(object):
         tmp = tmp.as_matrix().T
         xs = tmp[0]
         ys = tmp[1]
-        zs = tmp[2]
+        total_sf = tmp[2]
         n1, n2 = self._distances.shape
         n = n1 * n2
         self._xs = xs.reshape(n, -1)
         self._ys = ys.reshape(n, -1)
-        self._zs = zs.reshape(n, -1)
+        self._total_sf = total_sf.reshape(n, -1)
 
         if len(tmp) > 3:
             partial_density = tmp[3:]
@@ -110,6 +110,8 @@ class Plotter(object):
             self._partial_density = partial_density.reshape(ncol, n, -1)
         else:
             self._partial_density = None
+
+        self._zs = self._total_sf
 
     def configure(self, ax):
         pass

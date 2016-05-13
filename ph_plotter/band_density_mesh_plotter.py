@@ -27,6 +27,8 @@ class BandDensityPlotter(Plotter):
 
         if "rot_pr_weights" in data:
             self._rot_pr_weights = data["rot_pr_weights"]
+        if "pg_symbols" in data:
+            self._pg_symbols = data["pg_symbols"].reshape(n1 * n2)
         if "num_irs" in data:
             self._num_irs = data["num_irs"].reshape(n1 * n2, -1)
         if "ir_labels" in data:
@@ -41,7 +43,7 @@ class BandDensityPlotter(Plotter):
 
     def _create_sf_datafile(self, data_file):
         sf_datafile = data_file.replace(
-            "band.hdf5", "spectral_functions_atoms.dat")
+            "band.hdf5", "spectral_functions_irs.dat")
         return sf_datafile
 
         return self
@@ -90,19 +92,44 @@ class BandDensityPlotter(Plotter):
             ncolor=nticks_sf)
 
     def plot(self, ax):
+        self._quad_mesh = self._plot_sf(ax, self._total_sf)
+
+    def plot_selected_sf_irs(self, ax, irs_selected):
+        """
+
+        Parameters
+        ----------
+        ax : Matplotlib Axes object
+        irs_selected : Dictionary
+            Keys are for point groups, and values are for IRs to be plotted.
+        """
+        selected_sf_irs = self._create_selected_sf_irs(irs_selected)
+        self._quad_mesh = self._plot_sf(ax, selected_sf_irs)
+
+    def _plot_sf(self, ax, sf):
         variables = self._variables
 
         # "pcolormesh" is much faster than "pcolor".
         quad_mesh = ax.pcolormesh(
             self._xs / self._distances[-1, -1],  # normalization
             self._ys * variables["unit"],
-            self._zs,
+            sf,
             cmap=self._colormap,
             vmin=variables["sf_min"],
             vmax=variables["sf_max"],
             rasterized=True,  # This is important to make the figure light.
         )
-        self._quad_mesh = quad_mesh
+        return quad_mesh
+
+    def _create_selected_sf_irs(self, irs_selected):
+        selected_sf_irs = np.zeros_like(self._total_sf)  # Initialization
+        for i, pg_symbol in enumerate(self._pg_symbols):
+            if pg_symbol in irs_selected:
+                for ir_label in irs_selected[pg_symbol]:
+                    indices = np.where(self._ir_labels[i] == ir_label)
+                    selected_sf_irs[i] += np.sum(
+                        self._partial_density[:, i][indices], axis=0)
+        return selected_sf_irs
 
     def create_figure_name(self):
         variables = self._variables
