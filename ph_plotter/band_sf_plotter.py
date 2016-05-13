@@ -7,37 +7,56 @@ __author__ = "Yuji Ikeda"
 
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
-from .plotter import Plotter, read_band_labels
-from .file_io import read_band_hdf5
-from .colormap_creator import ColormapCreator
+from ph_plotter.plotter import Plotter, read_band_labels
+from ph_plotter.file_io import read_band_hdf5_dict
+from ph_plotter.colormap_creator import ColormapCreator
 
 
-class BandDensityPlotter(Plotter):
+class BandSFPlotter(Plotter):
     def load_data(self, data_file="band.hdf5"):
         print("Reading band.hdf5: ", end="")
-        distances, frequencies, pr_weights, nstars = read_band_hdf5(data_file)
+        data = read_band_hdf5_dict(data_file)
         print("Finished")
 
-        self._distances = distances
-        self._frequencies = frequencies
-        self._pr_weights = pr_weights
-        self._nstars = nstars
+        self._distances   = data["distances"]
+        self._frequencies = data["frequencies"]
+        self._pr_weights  = data["pr_weights"]
+        self._nstars      = data["nqstars"]
 
-        sf_datafile = data_file.replace("band.hdf5", "spectral_functions.dat")
-        self.load_spectral_functions(sf_datafile)
+        n1, n2 = self._distances.shape
+
+        if "rot_pr_weights" in data:
+            self._rot_pr_weights = data["rot_pr_weights"]
+        if "pg_symbols" in data:
+            self._pg_symbols = data["pg_symbols"].reshape(n1 * n2)
+        if "num_irs" in data:
+            self._num_irs = data["num_irs"].reshape(n1 * n2, -1)
+        if "ir_labels" in data:
+            self._ir_labels = data["ir_labels"].reshape(n1 * n2, -1)
+
+        sf_filename = self._create_sf_filename(data_file)
+        self.load_spectral_functions(sf_filename)
 
         band_labels = read_band_labels("band.conf")
         print("band_labels:", band_labels)
         self._band_labels = band_labels
 
-        return self
+    def _create_sf_filename(self, data_file):
+        if self._variables["sf_with"] == "elements":
+            suffix = "atoms"
+        elif self._variables["sf_with"] == "irs":
+            suffix = "irs"
+        else:
+            raise ValueError("Invarid option for spectral function.")
+
+        sf_filename = "spectral_functions_{}.dat".format(suffix)
+        sf_filename = data_file.replace("band.hdf5", sf_filename)
+        return sf_filename
 
     def configure(self, ax):
         variables = self._variables
 
         distances = self._distances / self._distances[-1, -1]  # normalization
-        frequencies = self._frequencies
-        pr_weights = self._pr_weights
 
         freq_label = "Frequency ({})".format(variables["freq_unit"])
         d_freq = variables["d_freq"]
@@ -76,25 +95,36 @@ class BandDensityPlotter(Plotter):
             ncolor=nticks_sf)
 
     def plot(self, ax):
-        variables = self._variables
+        self._object_plotted = self._plot_sf(ax, self._total_sf)
 
-        # "pcolormesh" is much faster than "pcolor".
-        PC = ax.contourf(
-            self._xs / self._distances[-1, -1],  # normalization
-            self._ys * variables["unit"],
-            self._zs,
-            cmap=self._colormap,
-            vmin=variables["sf_min"],
-            vmax=variables["sf_max"],
-            levels=self._sf_ticks,
-            extend="both",
-            # rasterized=True,  # This is important to make the figure light.
-        )
-        self._quad_mesh = PC
+    def plot_selected_sf_irs(self, ax, irs_selected):
+        """
+
+        Parameters
+        ----------
+        ax : Matplotlib Axes object
+        irs_selected : Dictionary
+            Keys are for point groups, and values are for IRs to be plotted.
+        """
+        selected_sf_irs = self._create_selected_sf_irs(irs_selected)
+        self._object_plotted = self._plot_sf(ax, selected_sf_irs)
+
+    def _create_selected_sf_irs(self, irs_selected):
+        selected_sf_irs = np.zeros_like(self._total_sf)  # Initialization
+        for i, pg_symbol in enumerate(self._pg_symbols):
+            if pg_symbol in irs_selected:
+                for ir_label in irs_selected[pg_symbol]:
+                    indices = np.where(self._ir_labels[i] == ir_label)
+                    selected_sf_irs[i] += np.sum(
+                        self._partial_density[:, i][indices], axis=0)
+        return selected_sf_irs
+
+    def _plot_sf(self, ax, sf):
+        raise NotImplementedError
 
     def create_figure_name(self):
         variables = self._variables
-        figure_name = "band_density_{}.{}".format(
+        figure_name = "band_sf_{}.{}".format(
             variables["freq_unit"],
             variables["figure_type"])
         return figure_name
@@ -120,7 +150,7 @@ class BandDensityPlotter(Plotter):
         variables = self._variables
 
         colorbar = fig.colorbar(
-            self._quad_mesh, ax=ax, extend="both", ticks=self._sf_ticks)
+            self._object_plotted, ax=ax, extend="both", ticks=self._sf_ticks)
         cb_label = "Spectral function (/{})".format(variables["freq_unit"])
         colorbar.set_label(
             cb_label,
