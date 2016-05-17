@@ -17,7 +17,7 @@ class BandPlotter(Plotter):
         distances, frequencies = read_band_yaml(yaml_file=data_file)
         print("Finished")
 
-        self._distances = distances
+        self._distances = distances / distances[-1, -1]
         self._frequencies = frequencies
 
         band_labels = read_band_labels("band.conf")
@@ -70,6 +70,20 @@ class BandPlotter(Plotter):
                 dashes=variables["dashes"],
                 linewidth=variables["linewidth"],
             )
+
+    def plot_selected_curve(self, ax, ipath, inum):
+        variables = self._variables
+        distances = self._distances
+        frequencies = self._frequencies
+
+        npath, nqpoint, nband = frequencies.shape
+        lines = ax.plot(
+            distances[ipath],
+            frequencies[ipath, :, inum] * variables["unit"],
+            variables["linecolor"],
+            dashes=variables["dashes"],
+            linewidth=variables["linewidth"],
+        )
 
     def create_figure_name(self):
         variables = self._variables
