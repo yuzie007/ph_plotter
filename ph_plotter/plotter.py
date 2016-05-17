@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division,
 __author__ = "Yuji Ikeda"
 
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 from units import THz2meV
 
@@ -23,14 +24,19 @@ def read_band_labels(phonopy_conf):
     settings = PhonopyConfParser(phonopy_conf, option_list=[]).get_settings()
     band_labels = settings.get_band_labels()
     gamma_str = r"\Gamma"
-    for i, band_label in enumerate(band_labels):
-        band_labels[i] = band_label.replace(gamma_str, u"Γ")
-    band_labels = tuple(band_labels)
+    if band_labels is not None:
+        for i, band_label in enumerate(band_labels):
+            band_labels[i] = band_label.replace(gamma_str, u"Γ")
+        band_labels = tuple(band_labels)
     return band_labels
 
 
 class Plotter(object):
-    def __init__(self, variables=None, is_horizontal=False):
+    def __init__(
+            self,
+            variables=None,
+            is_horizontal=False,
+            is_separated=False):
         if variables is None:
             variables = {}
         self._create_default_variables()
@@ -40,6 +46,12 @@ class Plotter(object):
         self._plot_atom = True
         self._plot_symbol = True
         self._plot_total = True
+
+        if is_separated:
+            tmp_func = self.load_spectral_functions_multiple
+        else:
+            tmp_func = self.load_spectral_functions_single
+        self.load_spectral_functions = tmp_func
 
     def _create_default_variables(self):
         self._variables = {
@@ -91,27 +103,76 @@ class Plotter(object):
         else:
             self._partial_density = None
 
-    def load_spectral_functions(self, filename="spectral_functions.dat"):
+    def load_spectral_functions_single(
+            self,
+            filename="spectral_functions.dat",
+            npath=None,
+            nqp=None):
         import pandas as pd
+
+        nq = npath * nqp
+
         tmp = pd.read_table(filename, delim_whitespace=True, header=None)
         tmp = tmp.as_matrix().T
         xs = tmp[0]
         ys = tmp[1]
         total_sf = tmp[2]
-        n1, n2 = self._distances.shape
-        n = n1 * n2
-        self._xs = xs.reshape(n, -1)
-        self._ys = ys.reshape(n, -1)
-        self._total_sf = total_sf.reshape(n, -1)
+        self._xs = xs.reshape(nq, -1)
+        self._ys = ys.reshape(nq, -1)
+        self._total_sf = total_sf.reshape(nq, -1)
 
         if len(tmp) > 3:
             partial_density = tmp[3:]
             ncol = len(partial_density)
-            self._partial_density = partial_density.reshape(ncol, n, -1)
+            self._partial_density = partial_density.reshape(ncol, nq, -1)
         else:
             self._partial_density = None
 
         self._zs = self._total_sf
+
+    def load_spectral_functions_multiple(
+            self,
+            filename="spectral_functions.dat",
+            npath=None,
+            nqp=None):
+        import pandas as pd
+
+        def create_new_filename(filename, directory):
+            d, b = os.path.split(filename)
+            return d + directory + b
+
+        xs = []
+        ys = []
+        total_sf = []
+        partial_sf = []
+        for ipath in range(npath):
+            for iqp in range(nqp):
+                directory = "{}_{}/".format(ipath, iqp)
+                print(directory)
+                new_filename = create_new_filename(filename, directory)
+                tmp = pd.read_table(
+                    new_filename,
+                    delim_whitespace=True,
+                    header=None)
+                tmp = tmp.as_matrix().T
+                xs.append(tmp[0])
+                ys.append(tmp[1])
+                total_sf.append(tmp[2])
+                if len(tmp) > 3:
+                    partial_sf.append(tmp[3:])
+
+        self._xs = np.array(xs)
+        self._ys = np.array(ys)
+        self._total_sf = np.array(total_sf)
+
+        if len(partial_sf) != 0:
+            partial_sf = np.array(partial_sf)
+            self._partial_sf = partial_sf.transpose((1, 0, 2))
+        else:
+            self._partial_sf = None
+
+        self._zs = self._total_sf
+        self._partial_density = self._partial_sf
 
     def configure(self, ax):
         pass

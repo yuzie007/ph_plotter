@@ -19,23 +19,27 @@ class BandSFPlotter(Plotter):
         print("Finished")
 
         self._distances   = data["distances"]
-        self._frequencies = data["frequencies"]
-        self._pr_weights  = data["pr_weights"]
-        self._nstars      = data["nqstars"]
 
-        n1, n2 = self._distances.shape
+        npath, nqp = self._distances.shape
+        nq = npath * nqp
 
+        if "frequencies" in data:
+            self._frequencies = data["frequencies"]
+        if "pr_weights" in data:
+            self._pr_weights = data["pr_weights"]
+        if "nqstars" in data:
+            self._narms = data["nqstars"]
         if "rot_pr_weights" in data:
             self._rot_pr_weights = data["rot_pr_weights"]
         if "pg_symbols" in data:
-            self._pg_symbols = data["pg_symbols"].reshape(n1 * n2)
+            self._pg_symbols = data["pg_symbols"].reshape(nq)
         if "num_irs" in data:
-            self._num_irs = data["num_irs"].reshape(n1 * n2, -1)
+            self._num_irs = data["num_irs"].reshape(nq)
         if "ir_labels" in data:
-            self._ir_labels = data["ir_labels"].reshape(n1 * n2, -1)
+            self._ir_labels = data["ir_labels"].reshape(nq, -1)
 
         sf_filename = self._create_sf_filename(data_file)
-        self.load_spectral_functions(sf_filename)
+        self.load_spectral_functions(sf_filename, npath, nqp)
 
         band_labels = read_band_labels("band.conf")
         print("band_labels:", band_labels)
@@ -65,7 +69,8 @@ class BandSFPlotter(Plotter):
         n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
         ax.set_xticks([0.0] + list(distances[:, -1]))
-        ax.set_xticklabels(self._band_labels)
+        if self._band_labels is not None:
+            ax.set_xticklabels(self._band_labels)
         ax.set_xlabel("Wave vector")
         ax.set_xlim(distances[0, 0], distances[-1, -1])
 

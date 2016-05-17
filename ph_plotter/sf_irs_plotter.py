@@ -10,10 +10,10 @@ from ph_plotter.spectral_functions_plotter import SpectralFunctionsPlotter
 
 
 class SFIRsPlotter(SpectralFunctionsPlotter):
-    def _create_sf_datafile(self, data_file):
-        sf_datafile = data_file.replace(
+    def _create_sf_filename(self, data_file):
+        sf_filename = data_file.replace(
             "band.hdf5", "spectral_functions_irs.dat")
-        return sf_datafile
+        return sf_filename
 
     def plot_q(self, ax, iq):
         lines_total = self.plot_total_q(ax, iq)

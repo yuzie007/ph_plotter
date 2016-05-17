@@ -10,6 +10,7 @@ from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 def run(variables):
     plot_style = variables.pop("plot_style")
+    is_separated = variables.pop("is_separated")
 
     if plot_style == "mesh":
         from ph_plotter.band_sf_mesh_plotter import (
@@ -19,7 +20,7 @@ def run(variables):
         from ph_plotter.band_sf_contour_plotter import (
             BandSFContourPlotter as BandSFPlotter)
 
-    BandSFPlotter(variables).run()
+    BandSFPlotter(variables, is_separated=is_separated).run()
 
 
 def main():
@@ -40,6 +41,9 @@ def main():
                         choices=["mesh", "contour"],
                         required=True,
                         help="Plot style for spectral fucntions.")
+    parser.add_argument("--sep", dest="is_separated",
+                        action="store_true",
+                        help="Spectral fucntions data is separated.")
     args = parser.parse_args()
 
     print(vars(args))
