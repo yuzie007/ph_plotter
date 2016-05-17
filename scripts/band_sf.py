@@ -20,6 +20,10 @@ def run(variables):
         from ph_plotter.band_sf_contour_plotter import (
             BandSFContourPlotter as BandSFPlotter)
 
+    elif plot_style == "imshow":
+        from ph_plotter.band_sf_imshow_plotter import (
+            BandSFImshowPlotter as BandSFPlotter)
+
     BandSFPlotter(variables, is_separated=is_separated).run()
 
 
@@ -38,7 +42,7 @@ def main():
                         help="To be plotted with total spectral functions.")
     parser.add_argument("--plot_style",
                         type=str,
-                        choices=["mesh", "contour"],
+                        choices=["mesh", "contour", "imshow"],
                         required=True,
                         help="Plot style for spectral fucntions.")
     parser.add_argument("--sep", dest="is_separated",
