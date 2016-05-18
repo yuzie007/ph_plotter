@@ -75,6 +75,7 @@ class Plotter(object):
             "alpha": 1.0,
             "poscar": "POSCAR",
             "sf_with": "atoms",
+            "ninterp": None,
         }
 
     def update_variables(self, variables):

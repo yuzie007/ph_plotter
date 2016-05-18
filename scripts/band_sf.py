@@ -48,6 +48,9 @@ def main():
     parser.add_argument("--sep", dest="is_separated",
                         action="store_true",
                         help="Spectral fucntions data is separated.")
+    parser.add_argument("--ninterp",
+                        type=int,
+                        help="Interpolation number.")
     args = parser.parse_args()
 
     print(vars(args))

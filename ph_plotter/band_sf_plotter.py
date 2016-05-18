@@ -99,6 +99,13 @@ class BandSFPlotter(Plotter):
             alpha=variables["alpha"],
             ncolor=nticks_sf)
 
+    def modify_data(self, distances, frequencies, sf):
+        ninterp = self._variables["ninterp"]
+        if ninterp is not None:
+            distances, frequencies, sf = interpolate_data(
+                distances, frequencies, sf, n=ninterp)
+        return distances, frequencies, sf
+
     def plot(self, ax):
         """
 
@@ -109,6 +116,9 @@ class BandSFPlotter(Plotter):
         distances = self._xs
         frequencies = self._ys
         sf = self._total_sf
+
+        distances, frequencies, sf = self.modify_data(
+            distances, frequencies, sf)
 
         self._object_plotted = self._plot_sf(
             ax, distances, frequencies, sf)
@@ -125,6 +135,9 @@ class BandSFPlotter(Plotter):
         distances = self._xs
         frequencies = self._ys
         sf = self._create_selected_sf_irs(irs_selected)
+
+        distances, frequencies, sf = self.modify_data(
+            distances, frequencies, sf)
 
         self._object_plotted = self._plot_sf(
             ax, distances, frequencies, sf)
@@ -176,3 +189,34 @@ class BandSFPlotter(Plotter):
             cb_label,
             verticalalignment="baseline",
             rotation=-90)
+
+
+def interpolate_data(xs, ys, zs, n):
+    from scipy.interpolate import griddata
+
+    xs_1d = xs[:, 0]
+    ys_1d = ys[0, :]
+    xs_fine_1d = create_fine_points(xs_1d, n)
+    ys_fine_1d = create_fine_points(ys_1d, n)
+
+    xs_fine, ys_fine = np.meshgrid(xs_fine_1d, ys_fine_1d)
+    xs_fine = xs_fine.flatten()
+    ys_fine = ys_fine.flatten()
+
+    zs_fine = griddata(
+        (xs.flatten(), ys.flatten()), zs.flatten(), (xs_fine, ys_fine),
+        method="cubic")
+
+    xs_fine = xs_fine.reshape(ys_fine_1d.size, xs_fine_1d.size).T
+    ys_fine = ys_fine.reshape(ys_fine_1d.size, xs_fine_1d.size).T
+    zs_fine = zs_fine.reshape(ys_fine_1d.size, xs_fine_1d.size).T
+
+    return xs_fine, ys_fine, zs_fine
+
+
+def create_fine_points(points, n):
+    tmp = np.repeat(points, n)
+    for i in range(n):
+        tmp[i:-n:n] += np.diff(points) * i / float(n)
+    points_fine = tmp[:1-n]
+    return points_fine
