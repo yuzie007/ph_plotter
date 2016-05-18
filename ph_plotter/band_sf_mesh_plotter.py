@@ -14,7 +14,7 @@ class BandSFMeshPlotter(BandSFPlotter):
 
         # "pcolormesh" is much faster than "pcolor".
         quad_mesh = ax.pcolormesh(
-            self._xs / self._distances[-1, -1],  # normalization
+            self._xs,
             self._ys * variables["unit"],
             sf,
             cmap=self._colormap,

@@ -117,7 +117,8 @@ class Plotter(object):
         xs = tmp[0]
         ys = tmp[1]
         total_sf = tmp[2]
-        self._xs = xs.reshape(nq, -1)
+
+        self._xs = xs.reshape(nq, -1) / np.nanmax(xs)
         self._ys = ys.reshape(nq, -1)
         self._total_sf = total_sf.reshape(nq, -1)
 

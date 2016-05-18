@@ -14,7 +14,7 @@ class BandSFImshowPlotter(BandSFPlotter):
 
         # "pcolormesh" is much faster than "pcolor".
         axes_image = ax.imshow(
-            # self._xs / self._distances[-1, -1],  # normalization
+            # self._xs,
             # self._ys * variables["unit"],
             sf.T,
             cmap=self._colormap,
