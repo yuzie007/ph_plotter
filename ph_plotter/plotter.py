@@ -138,20 +138,35 @@ class Plotter(object):
             npath=None,
             nqp=None):
         import pandas as pd
+        from ph_unfolder.irreps.character_tables import character_tables
 
-        def create_new_filename(filename, directory):
-            d, b = os.path.split(filename)
-            return d + directory + b
+        def modify_partial_sf_q(partial_sf_q):
+            max_irs = 12
+            ipad = max_irs - len(partial_sf_q)  # Needed to be filled
+            partial_sf_q = np.pad(
+                partial_sf_q,
+                ((0, ipad), (0, 0)),
+                mode=b'constant',
+                constant_values=np.nan)
+            return partial_sf_q
+
+        dirname, basename = os.path.split(filename)
+        if dirname == '':
+            dirname = '.'
+        dirname += '/'
 
         xs = []
         ys = []
         total_sf = []
         partial_sf = []
+        pg_symbols = []
+        ir_labels = []
+        num_irs = []
         for ipath in range(npath):
             for iqp in range(nqp):
-                directory = "{}_{}/".format(ipath, iqp)
-                print(directory)
-                new_filename = create_new_filename(filename, directory)
+                tmp_dir = "{}_{}/".format(ipath, iqp)
+                print(tmp_dir)
+                new_filename = dirname + tmp_dir + basename
                 tmp = pd.read_table(
                     new_filename,
                     delim_whitespace=True,
@@ -161,11 +176,25 @@ class Plotter(object):
                 ys.append(tmp[1])
                 total_sf.append(tmp[2])
                 if len(tmp) > 3:
-                    partial_sf.append(tmp[3:])
+                    partial_sf.append(modify_partial_sf_q(tmp[3:]))
 
-        self._xs = np.array(xs)
+                with open(dirname + tmp_dir + "pointgroup_symbol", "r") as f:
+                    for line in f:
+                        pg_symbol = line.strip()
+                pg_symbols.append(pg_symbol)
+                ir_label_list = character_tables[pg_symbol]["ir_labels"]
+                ir_labels.append(ir_label_list)
+                num_irs.append(len(ir_label_list))
+
+        xs = np.array(xs)
+
+        self._xs = xs / np.nanmax(xs)
         self._ys = np.array(ys)
         self._total_sf = np.array(total_sf)
+
+        self._pg_symbols = np.array(pg_symbols)
+        self._ir_labels = pd.DataFrame(ir_labels).as_matrix()
+        self._num_irs = np.array(num_irs)
 
         if len(partial_sf) != 0:
             partial_sf = np.array(partial_sf)
