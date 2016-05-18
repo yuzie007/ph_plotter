@@ -9,13 +9,13 @@ from ph_plotter.band_sf_plotter import BandSFPlotter
 
 
 class BandSFContourPlotter(BandSFPlotter):
-    def _plot_sf(self, ax, sf):
+    def _plot_sf(self, ax, distances, frequencies, sf):
         variables = self._variables
 
         # "pcolormesh" is much faster than "pcolor".
         quad_contour_set = ax.contourf(
-            self._xs,
-            self._ys * variables["unit"],
+            distances,
+            frequencies * variables["unit"],
             sf,
             cmap=self._colormap,
             vmin=variables["sf_min"],

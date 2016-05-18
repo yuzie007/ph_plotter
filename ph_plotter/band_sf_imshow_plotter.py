@@ -9,13 +9,13 @@ from ph_plotter.band_sf_plotter import BandSFPlotter
 
 
 class BandSFImshowPlotter(BandSFPlotter):
-    def _plot_sf(self, ax, sf):
+    def _plot_sf(self, ax, distances, frequencies, sf):
         variables = self._variables
 
         # "pcolormesh" is much faster than "pcolor".
         axes_image = ax.imshow(
-            # self._xs,
-            # self._ys * variables["unit"],
+            # distances,
+            # frequencies * variables["unit"],
             sf.T,
             cmap=self._colormap,
             aspect="auto",

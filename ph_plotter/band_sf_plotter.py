@@ -100,7 +100,18 @@ class BandSFPlotter(Plotter):
             ncolor=nticks_sf)
 
     def plot(self, ax):
-        self._object_plotted = self._plot_sf(ax, self._total_sf)
+        """
+
+        Parameters
+        ----------
+        ax : Matplotlib Axes object
+        """
+        distances = self._xs
+        frequencies = self._ys
+        sf = self._total_sf
+
+        self._object_plotted = self._plot_sf(
+            ax, distances, frequencies, sf)
 
     def plot_selected_sf_irs(self, ax, irs_selected):
         """
@@ -111,8 +122,12 @@ class BandSFPlotter(Plotter):
         irs_selected : Dictionary
             Keys are for point groups, and values are for IRs to be plotted.
         """
-        selected_sf_irs = self._create_selected_sf_irs(irs_selected)
-        self._object_plotted = self._plot_sf(ax, selected_sf_irs)
+        distances = self._xs
+        frequencies = self._ys
+        sf = self._create_selected_sf_irs(irs_selected)
+
+        self._object_plotted = self._plot_sf(
+            ax, distances, frequencies, sf)
 
     def _create_selected_sf_irs(self, irs_selected):
         selected_sf_irs = np.zeros_like(self._total_sf)  # Initialization
