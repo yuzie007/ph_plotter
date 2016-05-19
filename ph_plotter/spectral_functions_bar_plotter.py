@@ -8,30 +8,55 @@ __author__ = "Yuji Ikeda"
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
-from .plotter import Plotter, read_band_labels
-from .file_io import read_band_hdf5
+from ph_plotter.plotter import Plotter
+from ph_plotter.file_io import read_band_hdf5_dict
 
 
 class SpectralFunctionsPlotter(Plotter):
     def load_data(self, data_file="band.hdf5"):
         print("Reading band.hdf5: ", end="")
-        distances, frequencies, pr_weights, nstars = read_band_hdf5(data_file)
+        data = read_band_hdf5_dict(data_file)
         print("Finished")
 
-        self._distances = distances
-        self._frequencies = frequencies
-        self._pr_weights = pr_weights
-        self._nstars = nstars
+        self._distances   = data["distances"]
 
-        sf_datafile = data_file.replace("band.hdf5", "spectral_functions.dat")
-        self.load_spectral_functions(sf_datafile)
+        npath, nqp = self._distances.shape
+        nq = npath * nqp
+
+        if "frequencies" in data:
+            self._frequencies = data["frequencies"]
+        if "pr_weights" in data:
+            self._pr_weights = data["pr_weights"]
+        if "nqstars" in data:
+            self._narms = data["nqstars"]
+        if "rot_pr_weights" in data:
+            self._rot_pr_weights = data["rot_pr_weights"]
+        if "pg_symbols" in data:
+            self._pg_symbols = data["pg_symbols"].reshape(nq)
+        if "num_irs" in data:
+            self._num_irs = data["num_irs"].reshape(nq)
+        if "ir_labels" in data:
+            self._ir_labels = data["ir_labels"].reshape(nq, -1)
+
+        sf_filename = self._create_sf_filename(data_file)
+        self.load_spectral_functions(sf_filename, npath, nqp)
+
+        self.create_list_element_indices()
+        # For back-compatibility
+        if self._partial_density.shape[0] == 3 * self._natoms:
+            self._expand_list_element_indices()
+        print("list_element_indices:")
+        print(self._list_element_indices)
 
         return self
 
-    def plot(self, ax):
-        variables = self._variables
+    def _create_sf_filename(self, data_file):
+        sf_filename = data_file.replace(
+            "band.hdf5", "spectral_functions_atoms.dat")
+        return sf_filename
 
-        self.create_list_symbol_indices()
+    def configure(self, ax):
+        variables = self._variables
 
         freq_label = "Frequency ({})".format(variables["freq_unit"])
         d_freq = variables["d_freq"]
@@ -39,87 +64,131 @@ class SpectralFunctionsPlotter(Plotter):
         f_max = variables["f_max"]
         n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
-        mlx = AutoMinorLocator(2)
-        ax.xaxis.set_minor_locator(mlx)
-
-        ax.set_xticks(np.linspace(f_min, f_max, n_freq))
-        ax.set_xlabel(freq_label)
-        ax.set_xlim(f_min, f_max)
-
-        mly = AutoMinorLocator(2)
-        ax.yaxis.set_minor_locator(mly)
-
+        sf_label = "Spectral function (/{})".format(variables["freq_unit"])
         sf_min = variables["sf_min"]
         sf_max = variables["sf_max"]
         d_sf = variables["d_sf"]
-        n_sf = int(sf_max / float(d_sf))
-        ax.set_yticks(np.linspace(sf_min, sf_max, n_sf + 1))
-        ax.set_ylabel("Spectral function (/{})".format(variables["freq_unit"]))
-        ax.set_ylim(sf_min - d_sf * 0.25, sf_max)
+        nticks_sf = int(sf_max / float(d_sf)) + 1
 
+        mlx = AutoMinorLocator(2)
+        ax.xaxis.set_minor_locator(mlx)
+        mly = AutoMinorLocator(2)
+        ax.yaxis.set_minor_locator(mly)
+
+        # zero axis
         ax.axvline(0, color="k", dashes=(2, 2), linewidth=0.5)
+        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
 
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
+        if self._is_horizontal:
 
+            ax.set_xticks(np.linspace(f_min, f_max, n_freq))
+            ax.set_xlabel(freq_label)
+            ax.set_xlim(f_min, f_max)
+
+            ax.set_yticks(np.linspace(sf_min, sf_max, nticks_sf))
+            ax.set_ylabel(sf_label)
+            ax.set_ylim(sf_min, sf_max)
+
+        else:
+
+            ax.set_yticks(np.linspace(f_min, f_max, n_freq))
+            ax.set_ylabel(freq_label)
+            ax.set_ylim(f_min, f_max)
+
+            ax.set_xticks(np.linspace(sf_min, sf_max, nticks_sf))
+            ax.set_xlabel(sf_label)
+            ax.set_xlim(sf_min, sf_max)
+
+    def plot(self, ax):
+        self._fwidth = self._ys[0, 1] - self._ys[0, 0]
         figure_name = self.create_figure_name()
-        pdf = PdfPages(figure_name)
-        for i, x in enumerate(self._xs):
-            print(i)
-            freqs = make_steplike(self._ys[i], self._fwidth)
-            zs = make_steplike(self._zs[i], 0.0)
-            lines = ax.plot(
-                freqs * variables["unit"],
-                zs,
-                color=variables["linecolor"],
-                dashes=variables["dashes"],
-                label="Total",
-            )
-            lines_symbols = self.plot_symbol(ax, i)
-            ax.legend(loc=2, framealpha=0.5)
-            pdf.savefig(dpi=288, transparent=True)
-            lines[0].remove()
-            for lines in lines_symbols:
-                lines[0].remove()
-        pdf.close()
+        with PdfPages(figure_name) as pdf:
+            for iq, x in enumerate(self._xs):
+                print(iq)
+                lines_total, lines_symbols = self.plot_q(ax, iq)
+                ax.legend(framealpha=0.5)
+                pdf.savefig(dpi=288, transparent=True)
+                lines_total[0].remove()
+                for lines in lines_symbols:
+                    lines[0].remove()
 
-    def plot_symbol(self, ax, iq):
+    def plot_q(self, ax, iq):
+        lines_total = self.plot_total_q(ax, iq)
+        lines_symbols = self.plot_elements_q(ax, iq)
+        return lines_total, lines_symbols
+
+    def plot_total_q(self, ax, iq):
+        variables = self._variables
+
+        freqs = make_steplike(self._ys[iq], self._fwidth)
+        sf = make_steplike(self._zs[iq], 0.0)
+
+        if self._is_horizontal:
+            xs = freqs * variables["unit"]
+            ys = sf
+        else:
+            xs = sf
+            ys = freqs * variables["unit"]
+
+        lines_total = ax.plot(
+            xs,
+            ys,
+            color=variables["linecolor"],
+            dashes=variables["dashes"],
+            linewidth=variables["linewidth"],
+            label="Total",
+        )
+
+        return lines_total
+
+    def plot_elements_q(self, ax, iq):
+        from ph_plotter.attributes import colors, tuple_dashes
+
         variables = self._variables
         lines_symbols = []
-        colors = ("#ff0000", "#0000ff", "#007f00")
-        tuple_dashes = ((2, 2), (1, 1), (2, 1))
-        for i, symbol_indices in enumerate(self._list_symbol_indices):
-            s, indices = symbol_indices
+        for counter, element_indices in enumerate(self._list_element_indices):
+            element_label, indices = element_indices
             freqs = make_steplike(self._ys[iq], self._fwidth)
-            spectral_function = np.sum(self._partial_density[indices, iq], axis=0)
-            spectral_function = make_steplike(spectral_function, 0.0)
+            sf_symbol = np.sum(self._partial_density[indices, iq], axis=0)
+            sf_symbol = make_steplike(sf_symbol, 0.0)
+
+            if self._is_horizontal:
+                xs = freqs * variables["unit"]
+                ys = sf_symbol
+            else:
+                xs = sf_symbol
+                ys = freqs * variables["unit"]
+
             lines = ax.plot(
-                freqs * variables["unit"],
-                spectral_function,
-                color=colors[i],
-                dashes=tuple_dashes[i],
-                label=s,
+                xs,
+                ys,
+                color=colors[counter % len(colors)],
+                dashes=tuple_dashes[counter % len(tuple_dashes)],
+                linewidth=variables["linewidth"],
+                label=element_label,
             )
             lines_symbols.append(lines)
+
         return lines_symbols
 
-    def create_list_symbol_indices(self):
+    def create_list_element_indices(self):
         from phonopy.interface.vasp import read_vasp
-        print(self._variables)
         filename = self._variables["poscar"]
-        symbols = read_vasp(filename).get_chemical_symbols()
-        symbols3 = [s for s in symbols for i in range(3)]
+        atoms = read_vasp(filename)
+
+        symbols = atoms.get_chemical_symbols()
         reduced_symbols = sorted(set(symbols), key=symbols.index)
-        list_symbol_indices = []
+        list_element_indices = []
         for s in reduced_symbols:
-            indices = [i for i, x in enumerate(symbols3) if x == s]
-            list_symbol_indices.append((s, indices))
-        self._list_symbol_indices = list_symbol_indices
-        print("list_symbol_indices:")
-        print(list_symbol_indices)
+            indices = [i for i, x in enumerate(symbols) if x == s]
+            list_element_indices.append((s, indices))
+
+        self._natoms = atoms.get_number_of_atoms()
+        self._list_element_indices = list_element_indices
 
     def create_figure_name(self):
         variables = self._variables
-        figure_name = "spectral_functions_{}.{}".format(
+        figure_name = "spectral_functions_elements_{}.{}".format(
             variables["freq_unit"],
             variables["figure_type"])
         return figure_name
