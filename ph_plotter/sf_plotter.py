@@ -49,6 +49,10 @@ class SFPlotter(Plotter):
             self._nums_irreps = data["nums_irreps"].reshape(nq)
         if "ir_labels" in data:
             self._ir_labels = data["ir_labels"].reshape(nq, -1)
+        if "natoms_primitive" in data:
+            self._natoms_primitive = data["natoms_primitive"]
+        if "elements" in data:
+            self._elements = data["elements"]
 
     def load_density(self, filename="density.dat"):
         tmp = np.loadtxt(filename).T
