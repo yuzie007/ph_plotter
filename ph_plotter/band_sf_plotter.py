@@ -7,12 +7,13 @@ __author__ = "Yuji Ikeda"
 
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
-from ph_plotter.plotter import Plotter, read_band_labels
+from ph_plotter.plotter import read_band_labels
+from ph_plotter.sf_tmp_plotter import SFTMPPlotter
 from ph_plotter.file_io import read_band_hdf5_dict
 from ph_plotter.colormap_creator import ColormapCreator
 
 
-class BandSFPlotter(Plotter):
+class BandSFPlotter(SFTMPPlotter):
     def load_data(self, data_file="band.hdf5"):
         print("Reading band.hdf5: ", end="")
         data = read_band_hdf5_dict(data_file)
