@@ -58,7 +58,7 @@ class PointsSFIRsPlotter(PointsSFPlotter):
         return figure_name
 
     def _find_nonzero_irs(self, iq, prec=1e-6):
-        num_irs = self._num_irs[iq]
+        num_irs = self._nums_irreps[iq]
         sum_sfs = np.sum(self._partial_density[:num_irs, iq], axis=1)
         indices = np.where(sum_sfs > prec)[0]
         return indices

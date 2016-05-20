@@ -39,14 +39,14 @@ class SFPlotter(Plotter):
             self._frequencies = data["frequencies"]
         if "pr_weights" in data:
             self._pr_weights = data["pr_weights"]
-        if "nqstars" in data:
-            self._narms = data["nqstars"]
+        if "nums_arms" in data:
+            self._nums_arms = data["nums_arms"]
         if "rot_pr_weights" in data:
             self._rot_pr_weights = data["rot_pr_weights"]
         if "pg_symbols" in data:
             self._pg_symbols = data["pg_symbols"].reshape(nq)
-        if "num_irs" in data:
-            self._num_irs = data["num_irs"].reshape(nq)
+        if "nums_irreps" in data:
+            self._nums_irreps = data["nums_irreps"].reshape(nq)
         if "ir_labels" in data:
             self._ir_labels = data["ir_labels"].reshape(nq, -1)
 
@@ -161,7 +161,7 @@ class SFPlotter(Plotter):
 
         self._pg_symbols = np.array(pg_symbols)
         self._ir_labels = pd.DataFrame(ir_labels).as_matrix()
-        self._num_irs = np.array(num_irs)
+        self._nums_irreps = np.array(num_irs)
 
         if len(partial_sf) != 0:
             partial_sf = np.array(partial_sf)
