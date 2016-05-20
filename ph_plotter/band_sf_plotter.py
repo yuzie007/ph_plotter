@@ -130,7 +130,7 @@ class BandSFPlotter(SFPlotter):
                 for ir_label in irs_selected[pg_symbol]:
                     indices = np.where(self._ir_labels[i] == ir_label)
                     selected_sf_irs[i] += np.sum(
-                        self._partial_density[:, i][indices], axis=0)
+                        self._partial_sf[:, i][indices], axis=0)
         return selected_sf_irs
 
     def _plot_sf(self, ax, sf):

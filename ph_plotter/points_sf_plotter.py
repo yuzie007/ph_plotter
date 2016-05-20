@@ -23,7 +23,7 @@ class PointsSFPlotter(SFPlotter):
 
         self.create_list_element_indices()
         # For back-compatibility
-        if self._partial_density.shape[0] == 3 * self._natoms:
+        if self._partial_sf.shape[0] == 3 * self._natoms:
             self._expand_list_element_indices()
         print("list_element_indices:")
         print(self._list_element_indices)

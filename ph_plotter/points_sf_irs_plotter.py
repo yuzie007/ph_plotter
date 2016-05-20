@@ -29,7 +29,7 @@ class PointsSFIRsPlotter(PointsSFPlotter):
         for counter, index in enumerate(indices):
             ir_label = self._ir_labels[iq, index]
             ir_label = self._modify_ir_label(ir_label)
-            sf_symbol = self._partial_density[index, iq]
+            sf_symbol = self._partial_sf[index, iq]
 
             if self._is_horizontal:
                 xs = self._ys[iq] * variables["unit"]
@@ -59,7 +59,7 @@ class PointsSFIRsPlotter(PointsSFPlotter):
 
     def _find_nonzero_irs(self, iq, prec=1e-6):
         num_irs = self._nums_irreps[iq]
-        sum_sfs = np.sum(self._partial_density[:num_irs, iq], axis=1)
+        sum_sfs = np.sum(self._partial_sf[:num_irs, iq], axis=1)
         indices = np.where(sum_sfs > prec)[0]
         return indices
 

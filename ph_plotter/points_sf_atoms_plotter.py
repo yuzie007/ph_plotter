@@ -27,7 +27,7 @@ class PointsSFElementsPlotter(PointsSFPlotter):
         lines_symbols = []
         for counter, element_indices in enumerate(self._list_element_indices):
             element_label, indices = element_indices
-            sf_symbol = np.sum(self._partial_density[indices, iq], axis=0)
+            sf_symbol = np.sum(self._partial_sf[indices, iq], axis=0)
 
             if self._is_horizontal:
                 xs = self._ys[iq] * variables["unit"]

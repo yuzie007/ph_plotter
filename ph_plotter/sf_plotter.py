@@ -70,9 +70,9 @@ class SFPlotter(Plotter):
         if len(tmp) > 3:
             partial_density = tmp[3:]
             ncol = len(partial_density)
-            self._partial_density = partial_density.reshape(ncol, n, -1)
+            self._partial_sf = partial_density.reshape(ncol, n, -1)
         else:
-            self._partial_density = None
+            self._partial_sf = None
 
     def load_spectral_functions_single(
             self,
@@ -95,11 +95,11 @@ class SFPlotter(Plotter):
         self._total_sf = total_sf.reshape(nq, -1)
 
         if len(tmp) > 3:
-            partial_density = tmp[3:]
-            ncol = len(partial_density)
-            self._partial_density = partial_density.reshape(ncol, nq, -1)
+            partial_sf = tmp[3:]
+            ncol = len(partial_sf)
+            self._partial_sf = partial_sf.reshape(ncol, nq, -1)
         else:
-            self._partial_density = None
+            self._partial_sf = None
 
         self._zs = self._total_sf
 
@@ -174,4 +174,3 @@ class SFPlotter(Plotter):
             self._partial_sf = None
 
         self._zs = self._total_sf
-        self._partial_density = self._partial_sf
