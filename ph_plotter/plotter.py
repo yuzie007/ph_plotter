@@ -113,7 +113,8 @@ class Plotter(object):
 
         nq = npath * nqp
 
-        tmp = pd.read_table(filename, delim_whitespace=True, header=None)
+        tmp = pd.read_table(
+            filename, delim_whitespace=True, header=None, comment="#")
         tmp = tmp.as_matrix().T
         xs = tmp[0]
         ys = tmp[1]
