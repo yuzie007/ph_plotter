@@ -12,12 +12,12 @@ def run(variables):
     sf_with = variables.pop("sf_with")
 
     if sf_with == "elements":
-        from ph_plotter.sf_elements_plotter import SFElementsPlotter
-        SFElementsPlotter(variables).run()
+        from ph_plotter.points_sf_elements_plotter import PointsSFElementsPlotter
+        PointsSFElementsPlotter(variables).run()
 
     elif sf_with == "irs":
-        from ph_plotter.sf_irs_plotter import SFIRsPlotter
-        SFIRsPlotter(variables).run()
+        from ph_plotter.points_sf_irs_plotter import PointsSFIRsPlotter
+        PointsSFIRsPlotter(variables).run()
 
 
 def main():

@@ -6,10 +6,10 @@ from __future__ import (absolute_import, division,
 __author__ = "Yuji Ikeda"
 
 import numpy as np
-from ph_plotter.points_sf_plotter import SpectralFunctionsPlotter
+from ph_plotter.points_sf_plotter import PointsSFPlotter
 
 
-class SFIRsPlotter(SpectralFunctionsPlotter):
+class PointsSFIRsPlotter(PointsSFPlotter):
     def _create_sf_filename(self, data_file):
         sf_filename = data_file.replace(
             "band.hdf5", "spectral_functions_irs.dat")

@@ -8,36 +8,16 @@ __author__ = "Yuji Ikeda"
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from ph_plotter.plotter import read_band_labels
-from ph_plotter.sf_tmp_plotter import SFTMPPlotter
-from ph_plotter.file_io import read_band_hdf5_dict
+from ph_plotter.sf_plotter import SFPlotter
 from ph_plotter.colormap_creator import ColormapCreator
 
 
-class BandSFPlotter(SFTMPPlotter):
+class BandSFPlotter(SFPlotter):
     def load_data(self, data_file="band.hdf5"):
-        print("Reading band.hdf5: ", end="")
-        data = read_band_hdf5_dict(data_file)
-        print("Finished")
-
-        self._distances   = data["distances"]
+        super(BandSFPlotter, self).load_data(data_file)
 
         npath, nqp = self._distances.shape
         nq = npath * nqp
-
-        if "frequencies" in data:
-            self._frequencies = data["frequencies"]
-        if "pr_weights" in data:
-            self._pr_weights = data["pr_weights"]
-        if "nqstars" in data:
-            self._narms = data["nqstars"]
-        if "rot_pr_weights" in data:
-            self._rot_pr_weights = data["rot_pr_weights"]
-        if "pg_symbols" in data:
-            self._pg_symbols = data["pg_symbols"].reshape(nq)
-        if "num_irs" in data:
-            self._num_irs = data["num_irs"].reshape(nq)
-        if "ir_labels" in data:
-            self._ir_labels = data["ir_labels"].reshape(nq, -1)
 
         sf_filename = self._create_sf_filename(data_file)
         self.load_spectral_functions(sf_filename, npath, nqp)

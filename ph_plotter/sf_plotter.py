@@ -8,21 +8,47 @@ __author__ = "Yuji Ikeda"
 import os
 import numpy as np
 from ph_plotter.plotter import Plotter
+from ph_plotter.file_io import read_band_hdf5_dict
 
 
-class SFTMPPlotter(Plotter):
+class SFPlotter(Plotter):
     def __init__(
             self,
             variables=None,
             is_horizontal=False,
             is_separated=False):
-        super(SFTMPPlotter, self).__init__(variables, is_horizontal)
+        super(SFPlotter, self).__init__(variables, is_horizontal)
 
         if is_separated:
             tmp_func = self.load_spectral_functions_multiple
         else:
             tmp_func = self.load_spectral_functions_single
         self.load_spectral_functions = tmp_func
+
+    def load_data(self, data_file="band.hdf5"):
+        print("Reading band.hdf5: ", end="")
+        data = read_band_hdf5_dict(data_file)
+        print("Finished")
+
+        self._distances   = data["distances"]
+
+        npath, nqp = self._distances.shape
+        nq = npath * nqp
+
+        if "frequencies" in data:
+            self._frequencies = data["frequencies"]
+        if "pr_weights" in data:
+            self._pr_weights = data["pr_weights"]
+        if "nqstars" in data:
+            self._narms = data["nqstars"]
+        if "rot_pr_weights" in data:
+            self._rot_pr_weights = data["rot_pr_weights"]
+        if "pg_symbols" in data:
+            self._pg_symbols = data["pg_symbols"].reshape(nq)
+        if "num_irs" in data:
+            self._num_irs = data["num_irs"].reshape(nq)
+        if "ir_labels" in data:
+            self._ir_labels = data["ir_labels"].reshape(nq, -1)
 
     def load_density(self, filename="density.dat"):
         tmp = np.loadtxt(filename).T
