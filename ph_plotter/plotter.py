@@ -73,6 +73,7 @@ class Plotter(object):
             "dashes": (),
             "colormap": "red",
             "alpha": 1.0,
+            "markersize": 5.0,
             "poscar": "POSCAR",
             "sf_with": "atoms",
             "ninterp": None,
