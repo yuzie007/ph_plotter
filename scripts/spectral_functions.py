@@ -12,12 +12,18 @@ def run(variables):
     sf_with = variables.pop("sf_with")
 
     if sf_with == "elements":
-        from ph_plotter.points_sf_elements_plotter import PointsSFElementsPlotter
-        PointsSFElementsPlotter(variables).run()
+        from ph_plotter.points_sf_elements_plotter import (
+            PointsSFElementsPlotter as PointsSFPlotter)
 
     elif sf_with == "irs":
-        from ph_plotter.points_sf_irs_plotter import PointsSFIRsPlotter
-        PointsSFIRsPlotter(variables).run()
+        from ph_plotter.points_sf_irs_plotter import (
+            PointsSFIRsPlotter as PointsSFPlotter)
+
+    elif sf_with == "atoms":
+        from ph_plotter.points_sf_atoms_plotter import (
+            PointsSFAtomsPlotter as PointsSFPlotter)
+
+    PointsSFPlotter(variables).run()
 
 
 def main():
@@ -30,7 +36,7 @@ def main():
                         help="Filename of data.")
     parser.add_argument("--sf_with",
                         type=str,
-                        choices=["elements", "irs"],
+                        choices=["elements", "irs", "atoms"],
                         required=True,
                         help="To be plotted with the total spectral functions.")
     args = parser.parse_args()

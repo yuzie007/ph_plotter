@@ -9,7 +9,7 @@ import numpy as np
 from ph_plotter.points_sf_plotter import PointsSFPlotter
 
 
-class PointsSFElementsPlotter(PointsSFPlotter):
+class PointsSFAtomsPlotter(PointsSFPlotter):
     def _create_sf_filename(self, data_file):
         sf_filename = data_file.replace(
             "band.hdf5", "spectral_functions_atoms.dat")
