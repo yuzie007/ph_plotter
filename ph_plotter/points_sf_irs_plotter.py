@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division,
 __author__ = "Yuji Ikeda"
 
 import numpy as np
-from ph_plotter.spectral_functions_plotter import SpectralFunctionsPlotter
+from ph_plotter.points_sf_plotter import SpectralFunctionsPlotter
 
 
 class SFIRsPlotter(SpectralFunctionsPlotter):
