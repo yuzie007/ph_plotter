@@ -16,7 +16,7 @@ class BandSFPlotter(SFPlotter):
     def load_data(self, data_file="band.hdf5"):
         super(BandSFPlotter, self).load_data(data_file)
 
-        npath, nqp = self._distances.shape
+        npath, nqp = self._paths.shape[:2]
         nq = npath * nqp
 
         sf_filename = self._create_sf_filename(data_file)
@@ -28,13 +28,13 @@ class BandSFPlotter(SFPlotter):
 
     def _create_sf_filename(self, data_file):
         if self._variables["sf_with"] == "elements":
-            suffix = "atoms"
-        elif self._variables["sf_with"] == "irs":
-            suffix = "irs"
+            suffix = "elements"
+        elif self._variables["sf_with"] == "irreps":
+            suffix = "irreps"
         else:
             raise ValueError("Invarid option for spectral function.")
 
-        sf_filename = "spectral_functions_{}.dat".format(suffix)
+        sf_filename = "sf_{}.dat".format(suffix)
         sf_filename = data_file.replace("band.hdf5", sf_filename)
         return sf_filename
 

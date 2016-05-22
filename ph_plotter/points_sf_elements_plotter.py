@@ -11,8 +11,7 @@ from ph_plotter.points_sf_plotter import PointsSFPlotter
 
 class PointsSFElementsPlotter(PointsSFPlotter):
     def _create_sf_filename(self, data_file):
-        sf_filename = data_file.replace(
-            "band.hdf5", "spectral_functions_elements.dat")
+        sf_filename = data_file.replace("band.hdf5", "sf_elements.dat")
         return sf_filename
 
     def plot_q(self, ax, iq):
@@ -24,10 +23,12 @@ class PointsSFElementsPlotter(PointsSFPlotter):
         from .attributes import colors, tuple_dashes
 
         variables = self._variables
-        natoms_primitive = self._natoms_primitive
+        natoms_primitive = self._data_points[iq]['natoms_primitive']
+        elements         = self._data_points[iq]['elements'        ]
+
         lines_symbols = []
-        for counter, element_label in enumerate(self._elements):
-            slice_element = slice(counter, None, len(self._elements))
+        for counter, element_label in enumerate(elements):
+            slice_element = slice(counter, None, len(elements))
             sf_symbol = np.sum(self._partial_sf[slice_element, iq], axis=0)
 
             if self._is_horizontal:
@@ -51,7 +52,7 @@ class PointsSFElementsPlotter(PointsSFPlotter):
 
     def create_figure_name(self):
         variables = self._variables
-        figure_name = "spectral_functions_elements_{}.{}".format(
+        figure_name = "points_sf_elements_{}.{}".format(
             variables["freq_unit"],
             variables["figure_type"])
         return figure_name

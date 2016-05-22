@@ -11,8 +11,7 @@ from ph_plotter.points_sf_plotter import PointsSFPlotter
 
 class PointsSFIRsPlotter(PointsSFPlotter):
     def _create_sf_filename(self, data_file):
-        sf_filename = data_file.replace(
-            "band.hdf5", "spectral_functions_irs.dat")
+        sf_filename = data_file.replace("band.hdf5", "sf_irreps.dat")
         return sf_filename
 
     def plot_q(self, ax, iq):
@@ -27,7 +26,8 @@ class PointsSFIRsPlotter(PointsSFPlotter):
         lines_symbols = []
         indices = self._find_nonzero_irs(iq)
         for counter, index in enumerate(indices):
-            ir_label = self._ir_labels[iq, index]
+            # ir_label = self._ir_labels[iq, index]
+            ir_label = self._data_points[iq]['ir_labels'][index]
             ir_label = self._modify_ir_label(ir_label)
             sf_symbol = self._partial_sf[index, iq]
 
@@ -52,13 +52,13 @@ class PointsSFIRsPlotter(PointsSFPlotter):
 
     def create_figure_name(self):
         variables = self._variables
-        figure_name = "spectral_functions_irs_{}.{}".format(
+        figure_name = "points_sf_irreps_{}.{}".format(
             variables["freq_unit"],
             variables["figure_type"])
         return figure_name
 
     def _find_nonzero_irs(self, iq, prec=1e-6):
-        num_irs = self._nums_irreps[iq]
+        num_irs = self._data_points[iq]['num_irreps']
         sum_sfs = np.sum(self._partial_sf[:num_irs, iq], axis=1)
         indices = np.where(sum_sfs > prec)[0]
         return indices

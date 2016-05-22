@@ -15,7 +15,7 @@ class PointsSFPlotter(SFPlotter):
     def load_data(self, data_file="band.hdf5"):
         super(PointsSFPlotter, self).load_data(data_file)
 
-        npath, nqp = self._distances.shape
+        npath, nqp = self._paths.shape[:2]
         nq = npath * nqp
 
         sf_filename = self._create_sf_filename(data_file)

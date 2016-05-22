@@ -37,7 +37,7 @@ def main():
                         help="Filename of data.")
     parser.add_argument("--sf_with",
                         type=str,
-                        choices=["elements", "irs"],
+                        choices=["elements", "irreps"],
                         required=True,
                         help="To be plotted with total spectral functions.")
     parser.add_argument("--plot_style",

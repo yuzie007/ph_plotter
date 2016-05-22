@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division,
 __author__ = "Yuji Ikeda"
 
 import os
+import h5py
 import numpy as np
 from ph_plotter.plotter import Plotter
 from ph_plotter.file_io import read_band_hdf5_dict
@@ -26,33 +27,36 @@ class SFPlotter(Plotter):
         self.load_spectral_functions = tmp_func
 
     def load_data(self, data_file="band.hdf5"):
-        print("Reading band.hdf5: ", end="")
-        data = read_band_hdf5_dict(data_file)
+        print("# Reading band.hdf5: ", end="")
+        with h5py.File(data_file, 'r') as data:
+            self._paths = np.array(data['paths'])
+            npaths, npoints = self._paths.shape[:2]
+
+            keys = [
+                'natoms_primitive',
+                'elements',
+                'distance',
+                'num_irreps',
+                'ir_labels',
+            ]
+            data_points = []
+            distances = []
+            for ipath in range(npaths):
+                distances_on_path = []
+                for ip in range(npoints):
+                    group = '{}/{}/'.format(ipath, ip)
+                    data_points.append(
+                        {k: np.array(data[group + k]) for k in keys}
+                    )
+
+                    distances_on_path.append(
+                        np.array(data[group + 'distance']))
+                distances.append(distances_on_path)
+
+            self._data_points = data_points
+            self._distances = np.array(distances)
+
         print("Finished")
-
-        self._distances   = data["distances"]
-
-        npath, nqp = self._distances.shape
-        nq = npath * nqp
-
-        if "frequencies" in data:
-            self._frequencies = data["frequencies"]
-        if "pr_weights" in data:
-            self._pr_weights = data["pr_weights"]
-        if "nums_arms" in data:
-            self._nums_arms = data["nums_arms"]
-        if "rot_pr_weights" in data:
-            self._rot_pr_weights = data["rot_pr_weights"]
-        if "pg_symbols" in data:
-            self._pg_symbols = data["pg_symbols"].reshape(nq)
-        if "nums_irreps" in data:
-            self._nums_irreps = data["nums_irreps"].reshape(nq)
-        if "ir_labels" in data:
-            self._ir_labels = data["ir_labels"].reshape(nq, -1)
-        if "natoms_primitive" in data:
-            self._natoms_primitive = data["natoms_primitive"]
-        if "elements" in data:
-            self._elements = data["elements"]
 
     def load_density(self, filename="density.dat"):
         tmp = np.loadtxt(filename).T
