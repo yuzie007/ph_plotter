@@ -125,10 +125,12 @@ class BandSFPlotter(SFPlotter):
 
     def _create_selected_sf_irs(self, irs_selected):
         selected_sf_irs = np.zeros_like(self._total_sf)  # Initialization
-        for i, pg_symbol in enumerate(self._pg_symbols):
+        for i, data_point in enumerate(self._data_points):
+            ir_labels = data_point['ir_labels']
+            pg_symbol = str(data_point['pointgroup_symbol'])
             if pg_symbol in irs_selected:
-                for ir_label in irs_selected[pg_symbol]:
-                    indices = np.where(self._ir_labels[i] == ir_label)
+                for ir_label_selected in irs_selected[pg_symbol]:
+                    indices = np.where(ir_labels == ir_label_selected)
                     selected_sf_irs[i] += np.sum(
                         self._partial_sf[:, i][indices], axis=0)
         return selected_sf_irs

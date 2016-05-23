@@ -36,6 +36,7 @@ class SFPlotter(Plotter):
                 'natoms_primitive',
                 'elements',
                 'distance',
+                'pointgroup_symbol',
                 'num_irreps',
                 'ir_labels',
             ]
