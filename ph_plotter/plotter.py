@@ -46,12 +46,6 @@ class Plotter(object):
         self._plot_symbol = True
         self._plot_total = True
 
-        if is_separated:
-            tmp_func = self.load_spectral_functions_multiple
-        else:
-            tmp_func = self.load_spectral_functions_single
-        self.load_spectral_functions = tmp_func
-
     def _create_default_variables(self):
         self._variables = {
             "freq_unit": "THz",
