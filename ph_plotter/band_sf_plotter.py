@@ -155,23 +155,33 @@ class BandSFPlotter(SFPlotter):
     def save_figure_with_colorbar(self, fig, figure_name):
         variables = self._variables
 
-        self.create_colorbar(fig)
+        colorbar = self.create_colorbar(fig)
+        self.create_colorbar_label(colorbar)
 
         figure_name_w_bar = figure_name.replace(
             "." + variables["figure_type"],
             "_w_bar." + variables["figure_type"])
         fig.savefig(figure_name_w_bar, dpi=288, transparent=True)
 
-    def create_colorbar(self, fig, ax=None):
+    def create_colorbar(self, fig, cax=None, ax=None, **kwargs):
+        colorbar = fig.colorbar(
+            self._object_plotted,
+            cax=cax,
+            ax=ax,
+            extend="both",
+            ticks=self._sf_ticks,
+            **kwargs)
+        return colorbar
+
+    def create_colorbar_label(self, colorbar):
         variables = self._variables
 
-        colorbar = fig.colorbar(
-            self._object_plotted, ax=ax, extend="both", ticks=self._sf_ticks)
         cb_label = "Spectral function (/{})".format(variables["freq_unit"])
         colorbar.set_label(
             cb_label,
             verticalalignment="baseline",
-            rotation=-90)
+            rotation=-90,
+        )
 
 
 def interpolate_data(xs, ys, zs, n):
