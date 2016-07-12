@@ -27,12 +27,13 @@ class BandSFPlotter(SFPlotter):
         self._band_labels = band_labels
 
     def _create_sf_filename(self, data_file):
-        if self._variables["sf_with"] == "elements":
+        sf_type = self._variables["sf_with"]
+        if sf_type == "elements":
             suffix = "elements"
-        elif self._variables["sf_with"] == "irreps":
+        elif sf_type == "irreps":
             suffix = "irreps"
         else:
-            raise ValueError("Invarid option for spectral function.")
+            raise ValueError("Invalid option for spectral function", sf_type)
 
         sf_filename = "sf_{}.dat".format(suffix)
         sf_filename = data_file.replace("band.hdf5", sf_filename)
