@@ -40,6 +40,10 @@ class CommonArgumentsAdder(object):
                             default="r",
                             type=str,
                             help="Colors of the colormap.")
+        parser.add_argument("--linewidth",
+                            default=1.0,
+                            type=float,
+                            help="Linewidth.")
         parser.add_argument("-a", "--alpha",
                             default=1.0,
                             type=float,
