@@ -38,12 +38,15 @@ class PointsSFElementsPlotter(PointsSFPlotter):
                 xs = sf_symbol
                 ys = self._ys[iq] * variables["unit"]
 
+            linewidth = variables["linewidth"]
+            dashes = tuple_dashes[counter % len(tuple_dashes)]
+            dashes = self._modify_dashes_by_linewidth(dashes, linewidth)
             lines = ax.plot(
                 xs,
                 ys,
                 color=colors[counter % len(colors)],
-                dashes=tuple_dashes[counter % len(tuple_dashes)],
-                linewidth=variables["linewidth"],
+                dashes=dashes,
+                linewidth=linewidth,
                 label=element_label,
             )
             lines_symbols.append(lines)

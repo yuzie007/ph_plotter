@@ -143,3 +143,7 @@ class PointsSFPlotter(SFPlotter):
 
     def save_figure(self, fig, figure_name):
         pass
+
+    @staticmethod
+    def _modify_dashes_by_linewidth(dashes, linewidth):
+        return tuple(np.array(dashes) * linewidth)
