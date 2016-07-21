@@ -39,7 +39,7 @@ class PointsSFPlotter(SFPlotter):
         f_max = variables["f_max"]
         n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
-        sf_label = "Spectral function (/{})".format(variables["freq_unit"])
+        sf_label = self._create_sf_label()
         sf_min = variables["sf_min"]
         sf_max = variables["sf_max"]
         d_sf = variables["d_sf"]

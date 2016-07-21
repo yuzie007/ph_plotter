@@ -175,11 +175,9 @@ class BandSFPlotter(SFPlotter):
         return colorbar
 
     def create_colorbar_label(self, colorbar):
-        variables = self._variables
-
-        cb_label = "Spectral function (/{})".format(variables["freq_unit"])
+        sf_label = self._create_sf_label()
         colorbar.set_label(
-            cb_label,
+            sf_label,
             verticalalignment="baseline",
             rotation=-90,
         )

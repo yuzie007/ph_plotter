@@ -108,6 +108,8 @@ class SFPlotter(Plotter):
 
         self._zs = self._total_sf
 
+        self._is_squared = self._check_is_squared(filename)
+
     def load_spectral_functions_multiple(
             self,
             filename="spectral_functions.dat",
@@ -179,3 +181,25 @@ class SFPlotter(Plotter):
             self._partial_sf = None
 
         self._zs = self._total_sf
+
+    @staticmethod
+    def _check_is_squared(filename):
+        is_squared = True
+        with open(filename, 'r') as f:
+            for line in f:
+                if 'is_squared' in line:
+                    if line.split()[-1] == 'False':
+                        is_squared = False
+                    elif line.split()[-1] == 'True':
+                        is_squared = True
+                    break
+        return is_squared
+
+    def _create_sf_label(self):
+        freq_unit = self._variables['freq_unit']
+        if self._is_squared:
+            superscript = '$^{\minus2}$'
+        else:
+            superscript = '$^{\minus1}$'
+        sf_label = r'Spectral function ({}{})'.format(freq_unit, superscript)
+        return sf_label
