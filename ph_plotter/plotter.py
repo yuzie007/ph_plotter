@@ -175,3 +175,6 @@ class Plotter(object):
             if os.path.isfile(conf_file):
                 self._conf_file = conf_file
                 return
+
+    def get_object_plotted(self):
+        return self._object_plotted
