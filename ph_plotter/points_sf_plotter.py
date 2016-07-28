@@ -43,7 +43,7 @@ class PointsSFPlotter(SFPlotter):
         sf_min = variables["sf_min"]
         sf_max = variables["sf_max"]
         d_sf = variables["d_sf"]
-        nticks_sf = int(round(sf_max / d_sf)) + 1
+        nticks_sf = int(round((sf_max - sf_min) / d_sf)) + 1
 
         mlx = AutoMinorLocator(2)
         ax.xaxis.set_minor_locator(mlx)
