@@ -174,13 +174,13 @@ class BandSFPlotter(SFPlotter):
             **kwargs)
         return colorbar
 
-    def create_colorbar_label(self, colorbar):
+    def create_colorbar_label(self, colorbar, **kwargs):
         sf_label = self._create_sf_label()
         colorbar.set_label(
             sf_label,
             verticalalignment="baseline",
             rotation=-90,
-        )
+            **kwargs)
 
 
 def interpolate_data(xs, ys, zs, n):
