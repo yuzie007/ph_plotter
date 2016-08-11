@@ -12,24 +12,6 @@ from ph_plotter.sf_plotter import SFPlotter
 
 
 class PointsSFPlotter(SFPlotter):
-    def load_data(self, data_file="band.hdf5"):
-        super(PointsSFPlotter, self).load_data(data_file)
-
-        npath, nqp = self._paths.shape[:2]
-        nq = npath * nqp
-
-        sf_filename = self._create_sf_filename(data_file)
-        self.load_spectral_functions(sf_filename, npath, nqp)
-
-        self.create_list_element_indices()
-        # For back-compatibility
-        if self._partial_sf.shape[0] == 3 * self._natoms:
-            self._expand_list_element_indices()
-        print("list_element_indices:")
-        print(self._list_element_indices)
-
-        return self
-
     def configure(self, ax):
         variables = self._variables
 

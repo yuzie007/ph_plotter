@@ -13,19 +13,6 @@ from ph_plotter.colormap_creator import ColormapCreator
 
 
 class BandSFPlotter(SFPlotter):
-    def load_data(self, data_file="band.hdf5"):
-        super(BandSFPlotter, self).load_data(data_file)
-
-        npath, nqp = self._paths.shape[:2]
-        nq = npath * nqp
-
-        sf_filename = self._create_sf_filename(data_file)
-        self.load_spectral_functions(sf_filename, npath, nqp)
-
-        band_labels = read_band_labels("band.conf")
-        print("band_labels:", band_labels)
-        self._band_labels = band_labels
-
     def _create_sf_filename(self, data_file):
         sf_type = self._variables["sf_with"]
         if sf_type == "elements":

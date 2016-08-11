@@ -9,7 +9,7 @@ import os
 import h5py
 import numpy as np
 from ph_plotter.plotter import Plotter
-from ph_plotter.file_io import read_band_hdf5_dict
+from ph_plotter.plotter import read_band_labels
 
 
 class SFPlotter(Plotter):
@@ -26,11 +26,13 @@ class SFPlotter(Plotter):
             tmp_func = self.load_spectral_functions_single
         self.load_spectral_functions = tmp_func
 
-    def load_data(self, data_file="band.hdf5"):
-        print("# Reading band.hdf5: ", end="")
+    def load_data(self, data_file='sf.hdf5'):
         with h5py.File(data_file, 'r') as data:
             self._paths = np.array(data['paths'])
             npaths, npoints = self._paths.shape[:2]
+
+            frequencies = np.array(data['frequencies'])
+            self._is_squared = np.array(data['is_squared'])
 
             keys = [
                 'natoms_primitive',
@@ -39,6 +41,11 @@ class SFPlotter(Plotter):
                 'pointgroup_symbol',
                 'num_irreps',
                 'ir_labels',
+
+                'total_sf',
+                'partial_sf_s',
+                'partial_sf_e',
+                'partial_sf_s_e',
             ]
             data_points = []
             distances = []
@@ -57,7 +64,14 @@ class SFPlotter(Plotter):
             self._data_points = data_points
             self._distances = np.array(distances)
 
+        xs = self._distances.reshape(-1) / np.nanmax(self._distances)
+        self._ys, self._xs = np.meshgrid(frequencies, xs)
+
         print("Finished")
+
+        band_labels = read_band_labels("band.conf")
+        print("band_labels:", band_labels)
+        self._band_labels = band_labels
 
     def load_density(self, filename="density.dat"):
         tmp = np.loadtxt(filename).T
