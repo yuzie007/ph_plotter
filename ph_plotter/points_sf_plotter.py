@@ -64,9 +64,12 @@ class PointsSFPlotter(SFPlotter):
                 lines_total, lines_symbols = self.plot_q(ax, iq)
                 ax.legend(framealpha=0.5)
                 pdf.savefig(dpi=288, transparent=True)
-                lines_total[0].remove()
-                for lines in lines_symbols:
-                    lines[0].remove()
+
+                if lines_total is not None:
+                    lines_total[0].remove()
+                if lines_symbols is not None:
+                    for lines in lines_symbols:
+                        lines[0].remove()
 
     def plot_q(self, ax, iq):
         raise NotImplementedError
@@ -74,11 +77,13 @@ class PointsSFPlotter(SFPlotter):
     def plot_total_q(self, ax, iq):
         variables = self._variables
 
+        sf = self._data_points[iq]['total_sf']
+
         if self._is_horizontal:
             xs = self._ys[iq] * variables["unit"]
-            ys = self._zs[iq]
+            ys = sf
         else:
-            xs = self._zs[iq]
+            xs = sf
             ys = self._ys[iq] * variables["unit"]
 
         lines_total = ax.plot(

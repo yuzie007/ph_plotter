@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division,
 
 __author__ = "Yuji Ikeda"
 
+import json
 from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 
@@ -31,7 +32,7 @@ def main():
     parser = argparse.ArgumentParser()
     CommonArgumentsAdder().add_common_arguments(parser)
     parser.add_argument("--data_file",
-                        default="band.hdf5",
+                        default="sf.hdf5",
                         type=str,
                         help="Filename of data.")
     parser.add_argument("--sf_with",
@@ -39,6 +40,9 @@ def main():
                         choices=["elements", "irs", "atoms"],
                         required=True,
                         help="To be plotted with the total spectral functions.")
+    parser.add_argument("--selected_irreps",
+                        type=json.loads,
+                        help="Specification of Small Reps. ex. {'mm2': ['B2']}")
     args = parser.parse_args()
 
     print(vars(args))

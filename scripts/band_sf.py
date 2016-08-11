@@ -5,12 +5,12 @@ from __future__ import (absolute_import, division,
 
 __author__ = "Yuji Ikeda"
 
+import json
 from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 
 def run(variables):
     plot_style = variables.pop("plot_style")
-    is_separated = variables.pop("is_separated")
 
     if plot_style == "mesh":
         from ph_plotter.band_sf_mesh_plotter import (
@@ -24,7 +24,7 @@ def run(variables):
         from ph_plotter.band_sf_imshow_plotter import (
             BandSFImshowPlotter as BandSFPlotter)
 
-    BandSFPlotter(variables, is_separated=is_separated).run()
+    BandSFPlotter(variables).run()
 
 
 def main():
@@ -32,7 +32,7 @@ def main():
     parser = argparse.ArgumentParser()
     CommonArgumentsAdder().add_common_arguments(parser)
     parser.add_argument("--data_file",
-                        default="band.hdf5",
+                        default="sf.hdf5",
                         type=str,
                         help="Filename of data.")
     parser.add_argument("--sf_with",
@@ -45,12 +45,12 @@ def main():
                         choices=["mesh", "contour", "imshow"],
                         required=True,
                         help="Plot style for spectral fucntions.")
-    parser.add_argument("--sep", dest="is_separated",
-                        action="store_true",
-                        help="Spectral fucntions data is separated.")
     parser.add_argument("--ninterp",
                         type=int,
                         help="Interpolation number.")
+    parser.add_argument("--selected_irreps",
+                        type=json.loads,
+                        help="Specification of Small Reps. ex. {'mm2': ['B2']}")
     args = parser.parse_args()
 
     print(vars(args))
