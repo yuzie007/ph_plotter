@@ -217,3 +217,9 @@ class SFPlotter(Plotter):
             superscript = '$^{\minus1}$'
         sf_label = r'Spectral function ({}{})'.format(freq_unit, superscript)
         return sf_label
+
+    def create_total_sf(self):
+        total_sf = []
+        for i, data_point in enumerate(self._data_points):
+            total_sf.append(data_point['total_sf'])
+        return np.array(total_sf)

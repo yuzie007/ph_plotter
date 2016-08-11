@@ -82,9 +82,14 @@ class BandSFPlotter(SFPlotter):
         ----------
         ax : Matplotlib Axes object
         """
+        if self._variables['selected_irreps'] is not None:
+            irs_selected = self._variables['selected_irreps']
+            self.plot_selected_sf_irs(ax, irs_selected)
+            return
+
         distances = self._xs
         frequencies = self._ys
-        sf = self._total_sf
+        sf = self.create_total_sf()
 
         distances, frequencies, sf = self.modify_data(
             distances, frequencies, sf)
@@ -112,16 +117,17 @@ class BandSFPlotter(SFPlotter):
             ax, distances, frequencies, sf)
 
     def _create_selected_sf_irs(self, irs_selected):
-        selected_sf_irs = np.zeros_like(self._total_sf)  # Initialization
+        total_sf = self.create_total_sf()
+        partial_sf = np.zeros_like(total_sf)  # Initialization
         for i, data_point in enumerate(self._data_points):
             ir_labels = data_point['ir_labels']
             pg_symbol = str(data_point['pointgroup_symbol'])
             if pg_symbol in irs_selected:
                 for ir_label_selected in irs_selected[pg_symbol]:
                     indices = np.where(ir_labels == ir_label_selected)
-                    selected_sf_irs[i] += np.sum(
-                        self._partial_sf[:, i][indices], axis=0)
-        return selected_sf_irs
+                    for index in indices:
+                        partial_sf[i] += data_point['partial_sf_s'][:, index[0]]
+        return partial_sf
 
     def _plot_sf(self, ax, sf):
         raise NotImplementedError
