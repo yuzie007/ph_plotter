@@ -9,7 +9,7 @@ from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 
 def run(variables):
-    from ph_plotter.band_error_plotter import BandWidthPlotter
+    from ph_plotter.band_width_plotter import BandWidthPlotter
     BandWidthPlotter(variables).run()
 
 
