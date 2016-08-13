@@ -5,20 +5,77 @@ from __future__ import (absolute_import, division,
 
 __author__ = "Yuji Ikeda"
 
+import h5py
 import numpy as np
-from matplotlib.ticker import AutoMinorLocator
-from .plotter import Plotter, read_band_labels
-from .file_io import read_band_yaml
+from .band_plotter import BandPlotter
+from .plotter import read_band_labels
+from ph_unfolder.irreps.irreps import extract_degeneracy_from_ir_label
 
 
-class BandPlotter(Plotter):
-    def load_data(self, data_file="band.yaml"):
-        print("Reading band.yaml: ", end="")
-        distances, frequencies = read_band_yaml(yaml_file=data_file)
+# TODO(ikeda): Sort also ir_labels
+class BandWidthPlotter(BandPlotter):
+    def load_data(self, data_file="sf_fitted.hdf5"):
+        print("Reading data_file: ", end="")
+        with h5py.File(data_file, 'r') as data:
+            self._paths = np.array(data['paths'])
+            npaths, npoints = self._paths.shape[:2]
+
+            self._is_squared = np.array(data['is_squared'])
+
+            keys = [
+                'natoms_primitive',
+                'elements',
+                'distance',
+                'pointgroup_symbol',
+                'num_irreps',
+                'ir_labels',
+            ]
+            data_points = []
+            distances = []
+            frequencies = []
+            widths = []
+            for ipath in range(npaths):
+                distances_on_path = []
+                frequencies_on_path = []
+                widths_on_path = []
+                for ip in range(npoints):
+                    group = '{}/{}/'.format(ipath, ip)
+                    data_points.append(
+                        {k: np.array(data[group + k]) for k in keys}
+                    )
+
+                    distances_on_path.append(np.array(data[group + 'distance']))
+
+                    indices_nonzero = np.where(np.isfinite(data[group + 'norms_s']))
+                    ir_labels = np.array(data[group + 'ir_labels'])
+
+                    frequencies_on_point = []
+                    widths_on_point = []
+                    for index in indices_nonzero[0]:
+                        degeneracy = extract_degeneracy_from_ir_label(ir_labels[index])
+                        for i in range(degeneracy):
+                            frequencies_on_point.append(np.array(data[group + 'peaks_s' ])[index])
+                            widths_on_point     .append(np.array(data[group + 'widths_s'])[index])
+
+                    indices_sort = np.argsort(frequencies_on_point)
+
+                    frequencies_on_path.append(np.array(frequencies_on_point)[indices_sort])
+                    widths_on_path     .append(np.array(widths_on_point     )[indices_sort])
+
+                distances.append(distances_on_path)
+                frequencies.append(frequencies_on_path)
+                widths.append(widths_on_path)
         print("Finished")
+
+        distances   = np.array(distances)
+        frequencies = np.array(frequencies)
+        widths      = np.array(widths)
+
+        self._data_points = data_points
 
         self._distances = distances / distances[-1, -1]
         self._frequencies = frequencies
+        self._bandwidths = widths
 
         band_labels = read_band_labels("band.conf")
         print("band_labels:", band_labels)
@@ -26,40 +83,11 @@ class BandPlotter(Plotter):
 
         return self
 
-    def configure(self, ax):
-        variables = self._variables
-
-        distances = self._distances
-
-        freq_label = "Frequency ({})".format(variables["freq_unit"])
-        d_freq = variables["d_freq"]
-        f_min = variables["f_min"]
-        f_max = variables["f_max"]
-        n_freq = int(round((f_max - f_min) / d_freq)) + 1
-
-        ax.set_xticks([0.0] + list(distances[:, -1]))
-        ax.set_xticklabels(self._band_labels)
-        ax.set_xlabel("Wave vector")
-        ax.set_xlim(distances[0, 0], distances[-1, -1])
-
-        ax.set_yticks(np.linspace(f_min, f_max, n_freq))
-        ax.set_ylabel(freq_label)
-        ax.set_ylim(f_min, f_max)
-
-        mly = AutoMinorLocator(2)
-        ax.yaxis.set_minor_locator(mly)
-
-        for x in [0.0] + list(distances[:, -1]):
-            ax.axvline(x, color="k", dashes=(2, 2), linewidth=0.5)
-        # for y in np.linspace(f_min, f_max, n_freq):
-        #     ax.axhline(y, color="#000000", linestyle=":")
-        # zero axis
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
-
     def plot(self, ax):
         variables = self._variables
         distances = self._distances
         frequencies = self._frequencies
+        bandwidths = self._bandwidths
 
         npath, nqpoint, nband = frequencies.shape
         for ipath in range(npath):
@@ -70,8 +98,17 @@ class BandPlotter(Plotter):
                 dashes=variables["dashes"],
                 linewidth=variables["linewidth"],
             )
+            for ib in range(nband):
+                ax.fill_between(
+                    distances[ipath],
+                    (frequencies[ipath, :, ib] + bandwidths[ipath, :, ib]) * variables["unit"],
+                    (frequencies[ipath, :, ib] - bandwidths[ipath, :, ib]) * variables["unit"],
+                    edgecolor="none",
+                    facecolor=variables['linecolor'],
+                    alpha=variables['alpha'],
+                )
 
-    def plot_selected_curve(self, ax, ipath, inum):
+    def plot_selected_curve(self, ax, ipath, ib):
         variables = self._variables
         distances = self._distances
         frequencies = self._frequencies
@@ -79,10 +116,18 @@ class BandPlotter(Plotter):
         npath, nqpoint, nband = frequencies.shape
         lines = ax.plot(
             distances[ipath],
-            frequencies[ipath, :, inum] * variables["unit"],
+            frequencies[ipath, :, ib] * variables["unit"],
             variables["linecolor"],
             dashes=variables["dashes"],
             linewidth=variables["linewidth"],
+        )
+        ax.fill_between(
+            distances[ipath],
+            (frequencies[ipath, :, ib] + bandwidths[ipath, :, ib]) * variables["unit"],
+            (frequencies[ipath, :, ib] - bandwidths[ipath, :, ib]) * variables["unit"],
+            edgecolor="none",
+            facecolor=variables['linecolor'],
+            alpha=variables['alpha'],
         )
 
     def create_figure_name(self):
