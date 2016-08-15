@@ -70,6 +70,7 @@ class Plotter(object):
             "poscar": "POSCAR",
             "sf_with": "atoms",
             "ninterp": None,
+            "selected_irreps": None,
         }
 
     def update_variables(self, variables):
