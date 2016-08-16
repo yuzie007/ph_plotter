@@ -38,7 +38,8 @@ class BandPlotter(Plotter):
         n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
         ax.set_xticks([0.0] + list(distances[:, -1]))
-        ax.set_xticklabels(self._band_labels)
+        if self._band_labels is not None:
+            ax.set_xticklabels(self._band_labels)
         ax.set_xlabel("Wave vector")
         ax.set_xlim(distances[0, 0], distances[-1, -1])
 
