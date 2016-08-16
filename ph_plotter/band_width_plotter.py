@@ -112,6 +112,7 @@ class BandWidthPlotter(BandPlotter):
         variables = self._variables
         distances = self._distances
         frequencies = self._frequencies
+        bandwidths = self._bandwidths
 
         npath, nqpoint, nband = frequencies.shape
         lines = ax.plot(
