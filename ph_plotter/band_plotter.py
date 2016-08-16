@@ -49,8 +49,7 @@ class BandPlotter(Plotter):
         mly = AutoMinorLocator(2)
         ax.yaxis.set_minor_locator(mly)
 
-        for x in [0.0] + list(distances[:, -1]):
-            ax.axvline(x, color="k", dashes=(2, 2), linewidth=0.5)
+        ax.grid(True, axis='x', color='k', dashes=(2, 2), linewidth=0.5)
         # for y in np.linspace(f_min, f_max, n_freq):
         #     ax.axhline(y, color="#000000", linestyle=":")
         # zero axis
