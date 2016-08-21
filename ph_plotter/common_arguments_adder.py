@@ -44,6 +44,11 @@ class CommonArgumentsAdder(object):
                             default=1.0,
                             type=float,
                             help="Linewidth.")
+        parser.add_argument("--dashes",
+                            nargs="+",
+                            default=[],
+                            type=float,
+                            help="Dashes.")
         parser.add_argument("-a", "--alpha",
                             default=1.0,
                             type=float,
