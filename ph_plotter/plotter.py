@@ -64,7 +64,9 @@ class Plotter(object):
             "linecolor": "#ff0000",
             "linewidth": 1,
             "dashes": (),
-            "colormap": "red",
+            "colormap": "r",  # Obsolete
+            "colormap_p": "r",
+            "colormap_n": "b",
             "alpha": 1.0,
             "markersize": 5.0,
             "poscar": "POSCAR",

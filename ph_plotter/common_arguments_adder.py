@@ -36,10 +36,14 @@ class CommonArgumentsAdder(object):
                             default="r",  # red
                             type=str,
                             help="Linecolor.")
-        parser.add_argument("--colormap",  # red
+        parser.add_argument("--colormap_p",
                             default="r",
                             type=str,
-                            help="Colors of the colormap.")
+                            help="Colors of the positive colormap.")
+        parser.add_argument("--colormap_n",
+                            default="b",
+                            type=str,
+                            help="Colors of the negative colormap.")
         parser.add_argument("--linewidth",
                             default=1.0,
                             type=float,

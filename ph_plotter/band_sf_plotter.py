@@ -63,10 +63,12 @@ class BandSFPlotter(SFPlotter):
         # zero axis
         ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
 
-        self._colormap = ColormapCreator().create_colormap(
-            colorname=variables["colormap"],
+        self._colormap = ColormapCreator().create_colormap_new(
+            values=self._sf_ticks,
+            colorname_p=variables["colormap_p"],
+            colorname_n=variables["colormap_n"],
             alpha=variables["alpha"],
-            ncolor=nticks_sf)
+        )
 
     def modify_data(self, distances, frequencies, sf):
         ninterp = self._variables["ninterp"]
