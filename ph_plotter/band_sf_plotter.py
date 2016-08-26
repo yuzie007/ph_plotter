@@ -50,7 +50,7 @@ class BandSFPlotter(SFPlotter):
         sf_min = variables["sf_min"]
         sf_max = variables["sf_max"]
         d_sf = variables["d_sf"]
-        nticks_sf = int(round(sf_max / d_sf))
+        nticks_sf = int(round((sf_max - sf_min) / d_sf))
         self._sf_ticks = np.linspace(sf_min, sf_max, nticks_sf + 1)
 
         mly = AutoMinorLocator(2)
