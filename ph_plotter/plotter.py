@@ -73,6 +73,7 @@ class Plotter(object):
             "sf_with": "atoms",
             "ninterp": None,
             "selected_irreps": None,
+            "combinations_elements": None,
         }
 
     def update_variables(self, variables):

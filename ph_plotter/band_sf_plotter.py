@@ -84,14 +84,23 @@ class BandSFPlotter(SFPlotter):
         ----------
         ax : Matplotlib Axes object
         """
-        if self._variables['selected_irreps'] is not None:
-            irs_selected = self._variables['selected_irreps']
-            self.plot_selected_sf_irs(ax, irs_selected)
-            return
+        irs_selected = self._variables['selected_irreps']
+        combinations_elements = self._variables['combinations_elements']
 
+        if irs_selected is not None and combinations_elements is not None:
+            sf = self._create_selected_sf_irs_and_elements(irs_selected, combinations_elements)
+        elif selected_irreps is not None:
+            sf = self._create_selected_sf_irs(irs_selected)
+        elif combinations_elements is not None:
+            sf = self._create_selected_sf_elements(combinations_elements)
+        else:
+            sf = self.create_total_sf()
+
+        self._plot_sf_pre(ax, sf)
+
+    def _plot_sf_pre(self, ax, sf):
         distances = self._xs
         frequencies = self._ys
-        sf = self.create_total_sf()
 
         distances, frequencies, sf = self.modify_data(
             distances, frequencies, sf)
@@ -108,15 +117,16 @@ class BandSFPlotter(SFPlotter):
         irs_selected : Dictionary
             Keys are for point groups, and values are for IRs to be plotted.
         """
-        distances = self._xs
-        frequencies = self._ys
         sf = self._create_selected_sf_irs(irs_selected)
+        self._plot_sf_pre(ax, sf)
 
-        distances, frequencies, sf = self.modify_data(
-            distances, frequencies, sf)
+    def plot_sf_combinations_elements(self, ax, combinations_elements):
+        sf = self._create_selected_sf_elements(combinations_elements)
+        self._plot_sf_pre(ax, sf)
 
-        self._object_plotted = self._plot_sf(
-            ax, distances, frequencies, sf)
+    def plot_sf_irs_and_elements(self, ax, selected_irs, combinations_elements):
+        sf = self._create_selected_sf_irs_and_elements(selected_irs, combinations_elements)
+        self._plot_sf_pre(ax, sf)
 
     def _create_selected_sf_irs(self, irs_selected):
         total_sf = self.create_total_sf()
@@ -130,6 +140,52 @@ class BandSFPlotter(SFPlotter):
                     for index in indices:
                         partial_sf[i] += data_point['partial_sf_s'][:, index[0]]
         return partial_sf
+
+    def _create_selected_sf_irs_and_elements(self, irs_selected, combinations_elements):
+        total_sf = self.create_total_sf()
+        partial_sf = np.zeros_like(total_sf)  # Initialization
+        for i, data_point in enumerate(self._data_points):
+            elements = data_point['elements']
+            ir_labels = data_point['ir_labels']
+            pg_symbol = str(data_point['pointgroup_symbol'])
+            if pg_symbol in irs_selected:
+                for ir_label_selected in irs_selected[pg_symbol]:
+                    indices = np.where(ir_labels == ir_label_selected)
+                    for index in indices:
+                        partial_sf_e = data_point['partial_sf_s_e'][:, index[0]]
+                        partial_sf[i] += self._create_selected_sf_elements_point(
+                            partial_sf_e, elements, combinations_elements)
+        return partial_sf
+
+    def _create_selected_sf_elements(self, combinations_elements):
+        """Create partial sf for combinations of chemical elements
+
+        Parameters
+        ----------
+        combinations_elements:  list of lists
+            [['Cu', 'Cu'], ['Au', 'Au']]
+        """
+        total_sf = self.create_total_sf()
+        partial_sf = np.zeros(total_sf.shape, dtype=complex)  # Initialization
+        for i, data_point in enumerate(self._data_points):
+            elements = data_point['elements']
+            partial_sf_e = data_point['partial_sf_e']
+            partial_sf[i] = self._create_selected_sf_elements_point(
+                partial_sf_e, elements, combinations_elements)
+        partial_sf = partial_sf.real
+        return partial_sf
+
+    @staticmethod
+    def _create_selected_sf_elements_point(partial_sf_e, elements, combinations_elements):
+        partial_sf_point = np.zeros(partial_sf_e.shape[0], dtype=complex)
+        for combination_elements in combinations_elements:
+            ie0 = list(elements).index(combination_elements[0])
+            ie1 = list(elements).index(combination_elements[1])
+            partial_sf_point += np.sum(partial_sf_e[:, :, ie0, :, ie1], axis=(1, 2))
+            if ie0 != ie1:
+                partial_sf_point += np.sum(partial_sf_e[:, :, ie1, :, ie0], axis=(1, 2))
+        partial_sf_point = partial_sf_point.real
+        return partial_sf_point
 
     def _plot_sf(self, ax, sf):
         raise NotImplementedError

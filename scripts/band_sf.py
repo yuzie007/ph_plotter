@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division,
 __author__ = "Yuji Ikeda"
 
 import json
+import numpy as np
 from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 
@@ -51,7 +52,14 @@ def main():
     parser.add_argument("--selected_irreps",
                         type=json.loads,
                         help="Specification of Small Reps. ex. {'mm2': ['B2']}")
+    parser.add_argument("--combinations_elements",
+                        nargs='+',
+                        type=str,
+                        help="Specification of Combinations of elements. ex. Cu Cu Au Au")
     args = parser.parse_args()
+
+    if args.combinations_elements is not None:
+        args.combinations_elements = np.array(args.combinations_elements).reshape(-1, 2)
 
     print(vars(args))
     run(vars(args))
