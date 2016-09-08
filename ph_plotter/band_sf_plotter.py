@@ -89,7 +89,7 @@ class BandSFPlotter(SFPlotter):
 
         if irs_selected is not None and combinations_elements is not None:
             sf = self._create_selected_sf_irs_and_elements(irs_selected, combinations_elements)
-        elif selected_irreps is not None:
+        elif irs_selected is not None:
             sf = self._create_selected_sf_irs(irs_selected)
         elif combinations_elements is not None:
             sf = self._create_selected_sf_elements(combinations_elements)
