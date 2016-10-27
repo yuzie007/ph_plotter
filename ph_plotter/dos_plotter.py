@@ -72,7 +72,8 @@ class DOSPlotter(Plotter):
         f_max = variables["f_max"]
         n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
-        dos_label  = "Phonon DOS (/{})".format(variables["freq_unit"])
+        superscript = '$^{\minus1}$'
+        dos_label  = r"Phonon DOS ({}{})".format(variables["freq_unit"], superscript)
         dos_min   = variables["dos_min"]
         dos_max   = variables["dos_max"]
         dos_ticks = variables["dos_ticks"]
