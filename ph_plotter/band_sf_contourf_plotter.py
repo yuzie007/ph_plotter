@@ -8,18 +8,17 @@ __author__ = "Yuji Ikeda"
 from ph_plotter.band_sf_plotter import BandSFPlotter
 
 
-class BandSFContourPlotter(BandSFPlotter):
+class BandSFContourFPlotter(BandSFPlotter):
     def _plot_sf(self, ax, distances, frequencies, sf):
         variables = self._variables
 
         # "pcolormesh" is much faster than "pcolor".
-        quad_contour_set = ax.contour(
+        quad_contour_set = ax.contourf(
             distances,
             frequencies * variables["unit"],
             sf,
             cmap=self._colormap,
             linecolor="k",
-            linewidths=variables["linewidth"],
             vmin=variables["sf_min"],
             vmax=variables["sf_max"],
             levels=self._sf_ticks,
