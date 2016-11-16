@@ -22,6 +22,10 @@ class TotalDOSPlotter(DOSPlotter):
         self._plot_symbol = True
         self._plot_total = True
 
+    def load_data(self, data_file='total_dos.dat'):
+        super(TotalDOSPlotter, self).load_data(data_file)
+        return self
+
     def run(self):
 
         variables = self._variables

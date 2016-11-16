@@ -10,17 +10,9 @@ from .dos_plotter import DOSPlotter
 
 
 class PartialDOSPlotter(DOSPlotter):
-    def __init__(self, variables=None):
-        if variables is None:
-            variables = {}
-        self._create_default_variables()
-        self.update_variables({"data_file": "partial_dos.dat"})
-        self.update_variables(variables)
-
-        self._is_horizontal = False
-        self._plot_atom = True
-        self._plot_symbol = True
-        self._plot_total = True
+    def load_data(self, data_file='partial_dos.dat'):
+        super(PartialDOSPlotter, self).load_data(data_file)
+        return self
 
     def run(self):
 

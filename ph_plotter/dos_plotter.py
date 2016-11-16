@@ -12,6 +12,13 @@ from .plotter import Plotter
 
 
 class DOSPlotter(Plotter):
+    def __init__(self, variables=None, is_horizontal=False):
+        super(DOSPlotter, self).__init__(variables, is_horizontal)
+
+        self._plot_atom = True
+        self._is_symbols = True
+        self._plot_total = True
+
     def load_data(self, data_file):
         data = np.loadtxt(data_file).T
         print(np.sum(data[1]))
