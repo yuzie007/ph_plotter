@@ -33,8 +33,8 @@ class DOSPlotter(Plotter):
             fig = ax.get_figure()
             self.save_figure_dos_total(fig, figure_name)
             lines[0].remove()
-        if self._plot_symbol:
-            self.plot_dos_symbol(ax)
+        if self._is_symbols:
+            self.plot_dos_symbols(ax)
         if self._plot_atom:
             self.plot_dos_atom(ax)
 
@@ -45,7 +45,7 @@ class DOSPlotter(Plotter):
         self._plot_atom = plot_atom
 
     def set_plot_symbol(self, plot_symbol):
-        self._plot_symbol = plot_symbol
+        self._is_symbols = plot_symbol
 
     def set_plot_total(self, plot_total):
         self._plot_total = plot_total
@@ -123,27 +123,31 @@ class DOSPlotter(Plotter):
         # plotting procedure, this should not do anything.
         pass
 
-    def plot_dos_symbol(self, ax):
-        variables = self._variables
-
+    def plot_dos_symbols(self, ax):
         symbols = self._variables["symbols"]
         reduced_symbols = sorted(set(symbols), key=symbols.index)
         print(reduced_symbols)
         for i, s in enumerate(reduced_symbols):
-            indices = [i for i, x in enumerate(symbols) if x == s]
-            print(indices)
-            dos_symbol = np.sum(self._dos_list[indices], axis=0)
-            lines = ax.plot(
-                dos_symbol / (variables["unit"] * variables["natoms"] * 3),
-                self._frequencies * variables["unit"],
-                variables["linecolor"],
-                dashes=variables["dashes"],
-                linewidth=variables["linewidth"],
-            )
+            lines = self.plot_dos_symbol(ax, s)
             figure_name = self.create_figure_name(symbol=s)
             fig = ax.get_figure()
             fig.savefig(figure_name, transparent=True)
             lines[0].remove()
+
+    def plot_dos_symbol(self, ax, s):
+        variables = self._variables
+
+        indices = [i for i, x in enumerate(variables["symbols"]) if x == s]
+        print(indices)
+        dos_symbol = np.sum(self._dos_list[indices], axis=0)
+        lines = ax.plot(
+            dos_symbol / (variables["unit"] * variables["natoms"] * 3),
+            self._frequencies * variables["unit"],
+            variables["linecolor"],
+            dashes=variables["dashes"],
+            linewidth=variables["linewidth"],
+            )
+        return lines
 
     def plot_dos_atom(self, ax):
         variables = self._variables
