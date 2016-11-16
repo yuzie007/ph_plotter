@@ -148,16 +148,19 @@ class Plotter(object):
         self.update_variables(variables)
         self.create_figure()
 
-    def create_primitive(self, filename="POSCAR"):
+    def create_primitive(self, filename="POSCAR", conf_file=None):
         from phonopy.structure.cells import get_primitive
         from phonopy.interface.vasp import read_vasp
+        if conf_file is None:
+            self._check_conf_files()
+        else:
+            self.set_conf_file(conf_file)
         primitive_matrix = self._read_primitive_matrix()
         atoms = read_vasp(filename)
         return get_primitive(atoms, primitive_matrix)
 
     def _read_primitive_matrix(self):
         from phonopy.cui.settings import PhonopyConfParser
-        self._check_conf_files()
         phonopy_conf_parser = PhonopyConfParser(
             self._conf_file,
             option_list=[],
@@ -177,8 +180,11 @@ class Plotter(object):
         ]
         for conf_file in conf_files:
             if os.path.isfile(conf_file):
-                self._conf_file = conf_file
+                self.set_conf_file(conf_file)
                 return
+
+    def set_conf_file(self, conf_file):
+        self._conf_file = conf_file
 
     def get_object_plotted(self):
         return self._object_plotted
