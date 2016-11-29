@@ -138,7 +138,7 @@ class DOSPlotter(Plotter):
         variables = self._variables
 
         indices = [i for i, x in enumerate(variables["symbols"]) if x == s]
-        print(indices)
+        print(s, indices)
         dos_symbol = np.sum(self._dos_list[indices], axis=0)
         lines = ax.plot(
             dos_symbol / (variables["unit"] * variables["natoms"] * 3),
