@@ -74,7 +74,7 @@ class BandWeightsPlotter(Plotter):
                 points.extend(tmp)
         points = np.array(points)
 
-        self._colormap = ColormapCreator().create_colormap(
+        self._colormap = ColormapCreator().create_colormap_old(
             colorname=variables["colormap"],
             alpha=variables["alpha"],
             ncolor=n_sf)

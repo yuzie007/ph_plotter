@@ -10,7 +10,7 @@ def run(variables):
     from ph_plotter.colormap_creator import ColormapCreator
     import matplotlib.pyplot as plt
     import matplotlib as mpl
-    cmap = ColormapCreator().create_colormap(
+    cmap = ColormapCreator().create_colormap_old(
         colorname=variables["colormap"],
         ncolor=variables["ncolor"])
     fig, axarr = plt.subplots(

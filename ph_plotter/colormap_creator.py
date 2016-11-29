@@ -6,11 +6,11 @@ from __future__ import (absolute_import, division,
 __author__ = "Yuji Ikeda"
 
 import numpy as np
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ColorConverter, ListedColormap
 
 
 class ColormapCreator(object):
-    def create_colormap_new(self, values, colorname_p="red", colorname_n='white', alpha=1.0):
+    def create_colormap(self, values, colorname_p="red", colorname_n='white', alpha=1.0):
         prec = 1e-6
         ncolor_p = len(np.where(values >  prec)[0])
         ncolor_n = len(np.where(values < -prec)[0])
@@ -35,8 +35,6 @@ class ColormapCreator(object):
 
     @staticmethod
     def create_color_list(colorname, alpha, ncolor):
-        from matplotlib.colors import ColorConverter
-
         color_array = ColorConverter().to_rgba(colorname)
         color_array = np.array(color_array)
 
@@ -49,9 +47,7 @@ class ColormapCreator(object):
 
         return color_list
 
-    def create_colormap(self, colorname="red", alpha=1.0, ncolor=10):
-        from matplotlib.colors import ColorConverter
-
+    def create_colormap_old(self, colorname="red", alpha=1.0, ncolor=10):
         color_array = ColorConverter().to_rgba(colorname)
         color_array = np.array(color_array)
 
