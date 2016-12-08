@@ -57,10 +57,10 @@ class Plotter(object):
             "linecolor": "#ff0000",
             "linewidth": 1,
             "dashes": (),
-            "colormap": "r",  # Obsolete
             "colormap_p": "r",
             "colormap_n": "b",
             "alpha": 1.0,
+            "is_transparent_gradient": False,
             "markersize": 5.0,
             "poscar": "POSCAR",
             "sf_with": "atoms",
