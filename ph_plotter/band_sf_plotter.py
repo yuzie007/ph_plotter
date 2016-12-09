@@ -78,6 +78,9 @@ class BandSFPlotter(SFPlotter):
                 distances, frequencies, sf, n=ninterp)
         return distances, frequencies, sf
 
+    def set_colormap(self, colormap):
+        self._colormap = colormap
+
     def plot(self, ax):
         """
 
