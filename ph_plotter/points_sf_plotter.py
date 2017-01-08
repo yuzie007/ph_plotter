@@ -60,7 +60,7 @@ class PointsSFPlotter(SFPlotter):
         figure_name = self.create_figure_name()
         with PdfPages(figure_name) as pdf:
             for iq, x in enumerate(self._xs):
-                print(iq)
+                print(iq, self._data_points[iq]['pointgroup_symbol'])
                 lines_total, lines_symbols = self.plot_q(ax, iq)
                 ax.legend(framealpha=0.5)
                 pdf.savefig(dpi=288, transparent=True)
