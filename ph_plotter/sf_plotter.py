@@ -54,7 +54,7 @@ class SFPlotter(Plotter):
                 for ip in range(npoints):
                     group = '{}/{}/'.format(ipath, ip)
                     data_points.append(
-                        {k: np.array(data[group + k]) for k in keys}
+                        {k: np.array(data[group + k]) for k in keys if group + k in data}
                     )
 
                     distances_on_path.append(
