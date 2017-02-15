@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
-from ph_plotter.plotter import read_band_labels
 from ph_plotter.sf_plotter import SFPlotter
 from ph_plotter.colormap_creator import ColormapCreator
+
+
+__author__ = "Yuji Ikeda"
 
 
 class BandSFPlotter(SFPlotter):
@@ -191,7 +190,7 @@ class BandSFPlotter(SFPlotter):
         partial_sf_point = partial_sf_point.real
         return partial_sf_point
 
-    def _plot_sf(self, ax, sf):
+    def _plot_sf(self, ax, distances, frequencies, sf):
         raise NotImplementedError
 
     def create_figure_name(self):

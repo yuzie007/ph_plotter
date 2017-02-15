@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+from ph_plotter.band_sf_plotter import BandSFPlotter
+
 
 __author__ = "Yuji Ikeda"
-
-from ph_plotter.band_sf_plotter import BandSFPlotter
 
 
 class BandSFContourFPlotter(BandSFPlotter):

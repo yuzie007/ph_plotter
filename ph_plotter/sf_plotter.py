@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import os
 import h5py
 import numpy as np
 from ph_plotter.plotter import Plotter
 from ph_plotter.plotter import read_band_labels
+
+
+__author__ = "Yuji Ikeda"
 
 
 class SFPlotter(Plotter):

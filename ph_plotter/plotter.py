@@ -2,12 +2,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import os
 import matplotlib.pyplot as plt
-from units import THz2meV
+
+
+__author__ = "Yuji Ikeda"
 
 
 def read_primitive_matrix(phonopy_conf):
@@ -128,6 +127,9 @@ class Plotter(object):
         self.create_figure()
 
         return
+
+        from scipy.constants import eV, Planck
+        THz2meV = Planck / eV * 1e+15  # 4.135667662340164
 
         # meV
         variables.update({
