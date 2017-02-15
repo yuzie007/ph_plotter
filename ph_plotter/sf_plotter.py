@@ -223,3 +223,9 @@ class SFPlotter(Plotter):
         for i, data_point in enumerate(self._data_points):
             total_sf.append(data_point['total_sf'])
         return np.array(total_sf)
+
+    def get_data_points(self):
+        return self._data_points
+
+    def set_data_points(self, data_points):
+        self._data_points = data_points
