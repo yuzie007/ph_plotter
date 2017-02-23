@@ -57,7 +57,7 @@ class Plotter(object):
             "linewidth": 1,
             "dashes": (),
             "colormap_p": "r",
-            "colormap_n": "b",
+            "colormap_n": "w",
             "alpha": 1.0,
             "is_transparent_gradient": False,
             "markersize": 5.0,

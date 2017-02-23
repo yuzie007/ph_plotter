@@ -68,7 +68,7 @@ class BandSFPlotter(SFPlotter):
             alpha=variables["alpha"],
             is_transparent_gradient=variables["is_transparent_gradient"],
         )
-        self._colormap = cmap_creator.create_colormap(values=self._sf_ticks)
+        self._colormap = cmap_creator.create_colormap(ticks=self._sf_ticks)
 
     def modify_data(self, distances, frequencies, sf):
         ninterp = self._variables["ninterp"]
