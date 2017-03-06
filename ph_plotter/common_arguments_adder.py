@@ -9,15 +9,12 @@ __author__ = "Yuji Ikeda"
 class CommonArgumentsAdder(object):
     def add_common_arguments(self, parser):
         parser.add_argument("--f_max",
-                            default=10.0,
                             type=float,
                             help="Maximum plotted frequency (THz).")
         parser.add_argument("--f_min",
-                            default=-2.5,
                             type=float,
                             help="Minimum plotted frequency (THz).")
         parser.add_argument("--d_freq",
-                            default=2.5,
                             type=float,
                             help="Pitch for frequency (THz).")
         parser.add_argument("--sf_max",

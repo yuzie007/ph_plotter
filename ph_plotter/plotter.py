@@ -76,9 +76,9 @@ class Plotter(object):
         self._variables = {
             "freq_unit": "THz",
             "unit": 1.0,
-            "f_min": -2.5,
+            "f_min": -2.0,
             "f_max": 10.0,
-            "d_freq": 2.5,
+            "d_freq": 2.0,
             "dos_min": 0.0,
             "dos_max": 0.4,
             "dos_ticks": 0.1,
