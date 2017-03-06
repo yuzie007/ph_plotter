@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import numpy as np
 from ph_plotter.points_sf_plotter import PointsSFPlotter
+
+
+__author__ = "Yuji Ikeda"
 
 
 class PointsSFElementsPlotter(PointsSFPlotter):
@@ -58,7 +58,6 @@ class PointsSFElementsPlotter(PointsSFPlotter):
         return lines_symbols
 
     def plot_element_pairs_q(self, ax, iq):
-        from .attributes import colors, tuple_dashes
 
         variables = self._variables
         elements = self._data_points[iq]['elements']
@@ -67,12 +66,10 @@ class PointsSFElementsPlotter(PointsSFPlotter):
         sf_element_pair = np.sum(partial_sf, axis=(1, 3))
 
         lines_symbols = []
-        counter = -1
         for i1, e1 in enumerate(elements):
             for i2, e2 in enumerate(elements):
                 if i2 < i1:
                     continue
-                counter += 1
                 label='{}–{}'.format(e1, e2)
 
                 if i1 == i2:
@@ -89,17 +86,15 @@ class PointsSFElementsPlotter(PointsSFPlotter):
                     ys = self._ys[iq] * variables["unit"]
 
                 linewidth = variables["linewidth"]
-                dashes = tuple_dashes[counter % len(tuple_dashes)]
-                dashes = self._modify_dashes_by_linewidth(dashes, linewidth)
                 lines = ax.plot(
                     xs,
                     ys,
-                    color=colors[counter % len(colors)],
-                    dashes=dashes,
                     linewidth=linewidth,
                     label=label,
                 )
                 lines_symbols.append(lines)
+
+        self._reset_prop_cycle(ax)
 
         return lines_symbols
 

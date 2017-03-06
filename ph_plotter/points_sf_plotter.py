@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
 from ph_plotter.sf_plotter import SFPlotter
+
+
+__author__ = "Yuji Ikeda"
 
 
 class PointsSFPlotter(SFPlotter):
@@ -134,3 +134,8 @@ class PointsSFPlotter(SFPlotter):
     @staticmethod
     def _modify_dashes_by_linewidth(dashes, linewidth):
         return tuple(np.array(dashes) * linewidth)
+
+    @staticmethod
+    def _reset_prop_cycle(ax):
+        # http://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.set_prop_cycle.html#matplotlib.axes.Axes.set_prop_cycle
+        ax.set_prop_cycle(None)

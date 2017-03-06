@@ -3,10 +3,44 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 import os
+from cycler import cycler
+import numpy as np
 import matplotlib.pyplot as plt
 
 
 __author__ = "Yuji Ikeda"
+
+
+def update_prop_cycle(linewidth):
+    # https://github.com/vega/vega/wiki/Scales#scale-range-literals
+    colors = [
+        '#1f77b4',
+        '#ff7f0e',
+        '#2ca02c',
+        '#d62728',
+        '#9467bd',
+        '#8c564b',
+        '#e377c2',
+        '#7f7f7f',
+        '#bcbd22',
+        '#17becf',
+    ] * 3
+    dashes_list = [
+        (4, 1),
+        (2, 1),
+        (4, 1, 2, 1),
+        (4, 1, 2, 1, 2, 1),
+        (4, 1, 2, 1, 2, 1, 2, 1),
+        (8, 1, 4, 1),
+    ] * 5
+    for i, dashes in enumerate(dashes_list):
+        dashes_list[i] = _modify_dashes_by_linewidth(dashes, linewidth)
+
+    plt.rc('axes', prop_cycle=cycler('color', colors) + cycler('dashes', dashes_list))
+
+
+def _modify_dashes_by_linewidth(dashes, linewidth):
+    return tuple(np.array(dashes) * linewidth)
 
 
 def read_primitive_matrix(phonopy_conf):
@@ -98,6 +132,7 @@ class Plotter(object):
             "legend.fontsize": fontsize,
         }
         plt.rcParams.update(params)
+        update_prop_cycle(variables['linewidth'])  # This may be not needed for matplotlib 2.x
 
         fig, ax = plt.subplots(
             1, 1,
