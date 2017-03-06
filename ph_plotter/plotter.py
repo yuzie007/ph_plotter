@@ -87,6 +87,7 @@ class Plotter(object):
             "d_sf": 0.5,
             "figure_type": "pdf",
             "figsize": (5.0, 3.5),
+            "fontsize": 12.0,
             "linecolor": "k",
             "linewidth": 1,
             "dashes": (),
@@ -122,7 +123,7 @@ class Plotter(object):
     def create_figure(self):
         variables = self._variables
 
-        fontsize = 12
+        fontsize = variables['fontsize']
         params = {
             "font.family": "Arial",
             "font.size": fontsize,

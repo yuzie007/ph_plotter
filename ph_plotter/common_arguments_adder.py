@@ -64,7 +64,10 @@ class CommonArgumentsAdder(object):
                             nargs=2,
                             default=(5.0, 3.5),
                             type=float,
-                            help="Filesize of figures.")
+                            help="Figure size.")
+        parser.add_argument("--fontsize",
+                            type=float,
+                            help="Fontsize of figures.")
         parser.add_argument("--poscar",
                             default="POSCAR",
                             type=str,
