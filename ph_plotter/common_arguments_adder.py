@@ -33,7 +33,6 @@ class CommonArgumentsAdder(object):
                             type=float,
                             help="Ticks of spectral functions.")
         parser.add_argument("--linecolor",
-                            default="r",  # red
                             type=str,
                             help="Linecolor.")
         parser.add_argument("--colormap_p",

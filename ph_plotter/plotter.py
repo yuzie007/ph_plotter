@@ -53,7 +53,7 @@ class Plotter(object):
             "d_sf": 0.5,
             "figure_type": "pdf",
             "figsize": (5.0, 3.5),
-            "linecolor": "#ff0000",
+            "linecolor": "k",
             "linewidth": 1,
             "dashes": (),
             "colormap_p": "r",
@@ -69,7 +69,9 @@ class Plotter(object):
         }
 
     def update_variables(self, variables):
-        self._variables.update(variables)
+        for k, v in variables.items():
+            if v is not None:
+                self._variables[k] = v
 
     def load_data(self):
         raise NotImplementedError
