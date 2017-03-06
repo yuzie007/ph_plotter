@@ -66,7 +66,7 @@ class BandPlotter(Plotter):
             lines = ax.plot(
                 distances[ipath],
                 frequencies[ipath] * variables["unit"],
-                variables["linecolor"],
+                color=variables["linecolor"],
                 dashes=variables["dashes"],
                 linewidth=variables["linewidth"],
             )
