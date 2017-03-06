@@ -33,8 +33,8 @@ class PointsSFPlotter(SFPlotter):
         ax.yaxis.set_minor_locator(mly)
 
         # zero axis
-        ax.axvline(0, color="k", dashes=(2, 2), linewidth=0.5)
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
+        ax.axvline(0, color="#b0b0b0", linewidth=0.8)
+        ax.axhline(0, color="#b0b0b0", linewidth=0.8)
 
         if self._is_horizontal:
 
