@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import numpy as np
 from ph_plotter.points_sf_plotter import PointsSFPlotter
+
+
+__author__ = "Yuji Ikeda"
 
 
 class PointsSFIRsPlotter(PointsSFPlotter):
@@ -20,12 +20,11 @@ class PointsSFIRsPlotter(PointsSFPlotter):
         return lines_total, lines_symbols
 
     def plot_irs_q(self, ax, iq):
-        from .attributes import colors, tuple_dashes
 
         variables = self._variables
         lines_symbols = []
         indices = self._find_nonzero_irs(iq)
-        for counter, index in enumerate(indices):
+        for index in indices:
             # ir_label = self._ir_labels[iq, index]
             ir_label = self._data_points[iq]['ir_labels'][index]
             ir_label = self._modify_ir_label(ir_label)
@@ -39,17 +38,15 @@ class PointsSFIRsPlotter(PointsSFPlotter):
                 ys = self._ys[iq] * variables["unit"]
 
             linewidth = variables["linewidth"]
-            dashes = tuple_dashes[counter % len(tuple_dashes)]
-            dashes = self._modify_dashes_by_linewidth(dashes, linewidth)
             lines = ax.plot(
                 xs,
                 ys,
-                color=colors[counter % len(colors)],
-                dashes=dashes,
                 linewidth=linewidth,
                 label=ir_label,
             )
             lines_symbols.append(lines)
+
+        self._reset_prop_cycle(ax)
 
         return lines_symbols
 
