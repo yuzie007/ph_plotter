@@ -56,11 +56,11 @@ class BandSFPlotter(SFPlotter):
         ax.yaxis.set_minor_locator(mly)
 
         for x in [0.0] + list(distances[:, -1]):
-            ax.axvline(x, color="k", dashes=(2, 2), linewidth=0.5)
+            ax.axvline(x, color="#b0b0b0", linewidth=0.8, zorder=1)
         # for y in np.linspace(f_min, f_max, n_freq):
         #     ax.axhline(y, color="#000000", linestyle=":")
         # zero axis
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
+        ax.axhline(0, color="#b0b0b0", linewidth=0.8, zorder=1)
 
         cmap_creator = ColormapCreator(
             color_p=variables["colormap_p"],

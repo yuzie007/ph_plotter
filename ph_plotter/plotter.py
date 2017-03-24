@@ -11,6 +11,17 @@ import matplotlib.pyplot as plt
 __author__ = "Yuji Ikeda"
 
 
+def use_classic_ticks():
+    # For back-compatibility to matplotlib.1.5.3
+    params = {
+        'xtick.top': True,
+        'xtick.direction': 'in',
+        'ytick.right': True,
+        'ytick.direction': 'in',
+    }
+    plt.rcParams.update(params)
+
+
 def update_prop_cycle(linewidth):
     # https://github.com/vega/vega/wiki/Scales#scale-range-literals
     colors = [
@@ -108,6 +119,22 @@ class Plotter(object):
             if v is not None:
                 self._variables[k] = v
 
+    def update_rcParams(self):
+        variables = self._variables
+
+        fontsize = variables['fontsize']
+        params = {
+            "font.family": "Arial",
+            "font.size": fontsize,
+            # "mathtext.fontset": "custom",
+            # "mathtext.it": "Arial",
+            "mathtext.default": "regular",
+            "legend.fontsize": fontsize,
+        }
+        plt.rcParams.update(params)
+        use_classic_ticks()
+        update_prop_cycle(variables['linewidth'])  # This may be not needed for matplotlib 2.x
+
     def load_data(self):
         raise NotImplementedError
 
@@ -123,17 +150,7 @@ class Plotter(object):
     def create_figure(self):
         variables = self._variables
 
-        fontsize = variables['fontsize']
-        params = {
-            "font.family": "Arial",
-            "font.size": fontsize,
-            # "mathtext.fontset": "custom",
-            # "mathtext.it": "Arial",
-            "mathtext.default": "regular",
-            "legend.fontsize": fontsize,
-        }
-        plt.rcParams.update(params)
-        update_prop_cycle(variables['linewidth'])  # This may be not needed for matplotlib 2.x
+        self.update_rcParams()
 
         fig, ax = plt.subplots(
             1, 1,

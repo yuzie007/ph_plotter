@@ -50,11 +50,11 @@ class BandPlotter(Plotter):
         mly = AutoMinorLocator(2)
         ax.yaxis.set_minor_locator(mly)
 
-        ax.grid(True, axis='x', color='k', dashes=(2, 2), linewidth=0.5)
+        ax.grid(True, axis='x')
         # for y in np.linspace(f_min, f_max, n_freq):
         #     ax.axhline(y, color="#000000", linestyle=":")
         # zero axis
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
+        ax.axhline(0, color="#b0b0b0", linewidth=0.8)
 
     def plot(self, ax):
         variables = self._variables

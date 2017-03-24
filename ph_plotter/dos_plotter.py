@@ -100,7 +100,7 @@ class DOSPlotter(Plotter):
         ax.set_ylabel(freq_label)
         ax.set_ylim(f_min, f_max)
 
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)  # zero axis
+        ax.axhline(0, color="#b0b0b0", linewidth=0.8, zorder=1)  # zero axis
 
     def plot_dos_total(self, ax):
         variables = self._variables
