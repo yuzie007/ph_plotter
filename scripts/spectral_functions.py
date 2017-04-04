@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import json
 from ph_plotter.common_arguments_adder import CommonArgumentsAdder
+
+
+__author__ = "Yuji Ikeda"
 
 
 def run(variables):
@@ -15,6 +15,10 @@ def run(variables):
     if sf_with == "elements":
         from ph_plotter.points_sf_elements_plotter import (
             PointsSFElementsPlotter as PointsSFPlotter)
+
+    elif sf_with == "e2":
+        from ph_plotter.points_sf_e2_plotter import (
+            PointsSFE2Plotter as PointsSFPlotter)
 
     elif sf_with == "irs":
         from ph_plotter.points_sf_irs_plotter import (
@@ -37,7 +41,7 @@ def main():
                         help="Filename of data.")
     parser.add_argument("--sf_with",
                         type=str,
-                        choices=["elements", "irs", "atoms"],
+                        choices=["elements", "e2", "irs", "atoms"],
                         required=True,
                         help="To be plotted with the total spectral functions.")
     parser.add_argument("--selected_irreps",

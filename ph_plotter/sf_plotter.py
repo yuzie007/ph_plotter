@@ -46,6 +46,7 @@ class SFPlotter(Plotter):
                 'partial_sf_s',
                 'partial_sf_e',
                 'partial_sf_s_e',
+                'partial_sf_e2',
             ]
             data_points = []
             distances = []

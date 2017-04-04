@@ -10,10 +10,6 @@ __author__ = "Yuji Ikeda"
 
 
 class PointsSFElementsPlotter(PointsSFPlotter):
-    def _create_sf_filename(self, data_file):
-        sf_filename = data_file.replace("band.hdf5", "sf_elements.dat")
-        return sf_filename
-
     def plot_q(self, ax, iq):
         selected_irreps = self._variables['selected_irreps']
         if selected_irreps is None:
@@ -25,35 +21,34 @@ class PointsSFElementsPlotter(PointsSFPlotter):
         return lines_total, lines_symbols
 
     def plot_elements_q(self, ax, iq):
-        from .attributes import colors, tuple_dashes
 
         variables = self._variables
         elements = self._data_points[iq]['elements']
 
+        partial_sf = self._data_points[iq]['partial_sf_e2']
+        sf_elements = np.sum(partial_sf, axis=1)
+
         lines_symbols = []
-        for counter, element_label in enumerate(elements):
-            slice_element = slice(counter, None, len(elements))
-            sf_symbol = np.sum(self._partial_sf[slice_element, iq], axis=0)
+        for i, label in enumerate(elements):
+            sf = sf_elements[:, i]
 
             if self._is_horizontal:
                 xs = self._ys[iq] * variables["unit"]
-                ys = sf_symbol
+                ys = sf
             else:
-                xs = sf_symbol
+                xs = sf
                 ys = self._ys[iq] * variables["unit"]
 
             linewidth = variables["linewidth"]
-            dashes = tuple_dashes[counter % len(tuple_dashes)]
-            dashes = self._modify_dashes_by_linewidth(dashes, linewidth)
             lines = ax.plot(
                 xs,
                 ys,
-                color=colors[counter % len(colors)],
-                dashes=dashes,
                 linewidth=linewidth,
-                label=element_label,
+                label=label,
             )
             lines_symbols.append(lines)
+
+        self._reset_prop_cycle(ax)
 
         return lines_symbols
 
