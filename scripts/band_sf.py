@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import json
 import numpy as np
 from ph_plotter.common_arguments_adder import CommonArgumentsAdder
+
+
+__author__ = "Yuji Ikeda"
 
 
 def run(variables):
@@ -36,11 +36,6 @@ def main():
                         default="sf.hdf5",
                         type=str,
                         help="Filename of data.")
-    parser.add_argument("--sf_with",
-                        type=str,
-                        choices=["elements", "irreps"],
-                        required=True,
-                        help="To be plotted with total spectral functions.")
     parser.add_argument("--plot_style",
                         type=str,
                         choices=["mesh", "contour", "imshow"],
@@ -56,6 +51,10 @@ def main():
                         nargs='+',
                         type=str,
                         help="Specification of Combinations of elements. ex. Cu Cu Au Au")
+    parser.add_argument("--elements",
+                        nargs='+',
+                        type=str,
+                        help="Specification of elements. ex. Cu Au")
     args = parser.parse_args()
 
     if args.combinations_elements is not None:

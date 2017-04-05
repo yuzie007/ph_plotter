@@ -12,19 +12,6 @@ __author__ = "Yuji Ikeda"
 
 
 class BandSFPlotter(SFPlotter):
-    def _create_sf_filename(self, data_file):
-        sf_type = self._variables["sf_with"]
-        if sf_type == "elements":
-            suffix = "elements"
-        elif sf_type == "irreps":
-            suffix = "irreps"
-        else:
-            raise ValueError("Invalid option for spectral function", sf_type)
-
-        sf_filename = "sf_{}.dat".format(suffix)
-        sf_filename = data_file.replace("band.hdf5", sf_filename)
-        return sf_filename
-
     def configure(self, ax):
         variables = self._variables
 
@@ -89,8 +76,11 @@ class BandSFPlotter(SFPlotter):
         """
         irs_selected = self._variables['selected_irreps']
         combinations_elements = self._variables['combinations_elements']
+        elements = self._variables['elements']
 
-        if irs_selected is not None and combinations_elements is not None:
+        if elements is not None:
+            sf = self._create_selected_sf_e2(elements)
+        elif irs_selected is not None and combinations_elements is not None:
             sf = self._create_selected_sf_irs_and_elements(irs_selected, combinations_elements)
         elif irs_selected is not None:
             sf = self._create_selected_sf_irs(irs_selected)
@@ -188,6 +178,31 @@ class BandSFPlotter(SFPlotter):
             if ie0 != ie1:
                 partial_sf_point += np.sum(partial_sf_e[:, :, ie1, :, ie0], axis=(1, 2))
         partial_sf_point = partial_sf_point.real
+        return partial_sf_point
+
+    def _create_selected_sf_e2(self, elements_plotted):
+        """Create partial sf for chemical elements (no-cross term scheme)
+
+        Parameters
+        ----------
+        elements : list
+            ['Cu', 'Au']
+        """
+        total_sf = self.create_total_sf()
+        partial_sf = np.zeros_like(total_sf)  # Initialization
+        for i, data_point in enumerate(self._data_points):
+            elements = data_point['elements']
+            partial_sf_e2 = data_point['partial_sf_e2']
+            partial_sf[i] = self._create_selected_sf_e2_point(
+                partial_sf_e2, elements, elements_plotted)
+        return partial_sf
+
+    @staticmethod
+    def _create_selected_sf_e2_point(partial_sf_e2, elements, elements_plotted):
+        partial_sf_point = np.zeros(partial_sf_e2.shape[0])
+        for e0 in elements_plotted:
+            ie0 = list(elements).index(e0)
+            partial_sf_point += np.sum(partial_sf_e2[:, :, ie0], axis=1)
         return partial_sf_point
 
     def _plot_sf(self, ax, distances, frequencies, sf):

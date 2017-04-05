@@ -112,6 +112,7 @@ class Plotter(object):
             "ninterp": None,
             "selected_irreps": None,
             "combinations_elements": None,
+            "elements": None,
         }
 
     def update_variables(self, variables):
