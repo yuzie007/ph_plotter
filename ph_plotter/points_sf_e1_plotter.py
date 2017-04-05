@@ -20,47 +20,13 @@ class PointsSFElementsPlotter(PointsSFPlotter):
             lines_symbols = self.plot_q_selected_irreps(ax, iq, selected_irreps)
         return lines_total, lines_symbols
 
-    def plot_elements_q(self, ax, iq):
-
-        variables = self._variables
-        elements = self._data_points[iq]['elements']
-
-        partial_sf = self._data_points[iq]['partial_sf_e2']
-        sf_elements = np.sum(partial_sf, axis=1)
-
-        lines_symbols = []
-        for i, label in enumerate(elements):
-            sf = sf_elements[:, i]
-
-            if self._is_horizontal:
-                xs = self._frequencies[iq] * variables["unit"]
-                ys = sf
-            else:
-                xs = sf
-                ys = self._frequencies[iq] * variables["unit"]
-
-            linewidth = variables["linewidth"]
-            lines = ax.plot(
-                xs,
-                ys,
-                linewidth=linewidth,
-                label=label,
-            )
-            lines_symbols.append(lines)
-
-        self._reset_prop_cycle(ax)
-
-        return lines_symbols
-
     def plot_element_pairs_q(self, ax, iq):
 
-        variables = self._variables
         elements = self._data_points[iq]['elements']
 
         partial_sf = self._data_points[iq]['partial_sf_e']
         sf_element_pair = np.sum(partial_sf, axis=(1, 3))
 
-        lines_symbols = []
         for i1, e1 in enumerate(elements):
             for i2, e2 in enumerate(elements):
                 if i2 < i1:
@@ -73,25 +39,9 @@ class PointsSFElementsPlotter(PointsSFPlotter):
                     sf = sf_element_pair[:, i1, i2] + sf_element_pair[:, i2, i1]
                 sf = sf.real
 
-                if self._is_horizontal:
-                    xs = self._frequencies[iq] * variables["unit"]
-                    ys = sf
-                else:
-                    xs = sf
-                    ys = self._frequencies[iq] * variables["unit"]
+                self._plot_curve(ax, iq, sf, label=label)
 
-                linewidth = variables["linewidth"]
-                lines = ax.plot(
-                    xs,
-                    ys,
-                    linewidth=linewidth,
-                    label=label,
-                )
-                lines_symbols.append(lines)
-
-        self._reset_prop_cycle(ax)
-
-        return lines_symbols
+        return
 
     def plot_q_selected_irreps_total(self, ax, iq, irs_selected):
         from .attributes import colors, tuple_dashes
@@ -134,9 +84,7 @@ class PointsSFElementsPlotter(PointsSFPlotter):
         return lines_total
 
     def plot_q_selected_irreps(self, ax, iq, irs_selected):
-        from .attributes import colors, tuple_dashes
 
-        variables = self._variables
         elements = self._data_points[iq]['elements']
 
         data_point = self._data_points[iq]
@@ -155,13 +103,10 @@ class PointsSFElementsPlotter(PointsSFPlotter):
             for index in indices:
                 partial_sf += data_point['partial_sf_s_e'][:, index[0]]
 
-        lines_symbols = []
-        counter = -1
         for i1, e1 in enumerate(elements):
             for i2, e2 in enumerate(elements):
                 if i2 < i1:
                     continue
-                counter += 1
                 label='{}–{}'.format(e1, e2)
                 sf_element_pair = np.sum(partial_sf, axis=(1, 3))
 
@@ -171,27 +116,9 @@ class PointsSFElementsPlotter(PointsSFPlotter):
                     sf = sf_element_pair[:, i1, i2] + sf_element_pair[:, i2, i1]
                 sf = sf.real
 
-                if self._is_horizontal:
-                    xs = self._frequencies[iq] * variables["unit"]
-                    ys = sf
-                else:
-                    xs = sf
-                    ys = self._frequencies[iq] * variables["unit"]
+                self._plot_curve(ax, iq, sf, label=label)
 
-                linewidth = variables["linewidth"]
-                dashes = tuple_dashes[counter % len(tuple_dashes)]
-                dashes = self._modify_dashes_by_linewidth(dashes, linewidth)
-                lines = ax.plot(
-                    xs,
-                    ys,
-                    color=colors[counter % len(colors)],
-                    dashes=dashes,
-                    linewidth=linewidth,
-                    label=label,
-                )
-                lines_symbols.append(lines)
-
-        return lines_symbols
+        return
 
     def create_figure_name(self):
         variables = self._variables

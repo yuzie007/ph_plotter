@@ -21,8 +21,6 @@ class PointsSFIRsPlotter(PointsSFPlotter):
 
     def plot_irs_q(self, ax, iq):
 
-        variables = self._variables
-        lines_symbols = []
         indices = self._find_nonzero_irs(iq)
         for index in indices:
             # ir_label = self._ir_labels[iq, index]
@@ -30,25 +28,9 @@ class PointsSFIRsPlotter(PointsSFPlotter):
             ir_label = self._modify_ir_label(ir_label)
             sf_symbol = self._data_points[iq]['partial_sf_s'][:, index]
 
-            if self._is_horizontal:
-                xs = self._frequencies[iq] * variables["unit"]
-                ys = sf_symbol
-            else:
-                xs = sf_symbol
-                ys = self._frequencies[iq] * variables["unit"]
+            self._plot_curve(ax, iq, sf_symbol, label=ir_label)
 
-            linewidth = variables["linewidth"]
-            lines = ax.plot(
-                xs,
-                ys,
-                linewidth=linewidth,
-                label=ir_label,
-            )
-            lines_symbols.append(lines)
-
-        self._reset_prop_cycle(ax)
-
-        return lines_symbols
+        return
 
     def create_figure_name(self):
         variables = self._variables
