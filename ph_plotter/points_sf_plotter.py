@@ -80,11 +80,11 @@ class PointsSFPlotter(SFPlotter):
         sf = self._data_points[iq]['total_sf']
 
         if self._is_horizontal:
-            xs = self._ys[iq] * variables["unit"]
+            xs = self._frequencies[iq] * variables["unit"]
             ys = sf
         else:
             xs = sf
-            ys = self._ys[iq] * variables["unit"]
+            ys = self._frequencies[iq] * variables["unit"]
 
         lines_total = ax.plot(
             xs,

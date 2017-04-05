@@ -29,11 +29,11 @@ class PointsSFE2Plotter(PointsSFPlotter):
             sf = sf_elements[:, i]
 
             if self._is_horizontal:
-                xs = self._ys[iq] * variables["unit"]
+                xs = self._frequencies[iq] * variables["unit"]
                 ys = sf
             else:
                 xs = sf
-                ys = self._ys[iq] * variables["unit"]
+                ys = self._frequencies[iq] * variables["unit"]
 
             linewidth = variables["linewidth"]
             lines = ax.plot(

@@ -30,11 +30,11 @@ class PointsSFAtomsPlotter(PointsSFPlotter):
             sf_symbol = np.sum(self._partial_sf[indices, iq], axis=0)
 
             if self._is_horizontal:
-                xs = self._ys[iq] * variables["unit"]
+                xs = self._frequencies[iq] * variables["unit"]
                 ys = sf_symbol
             else:
                 xs = sf_symbol
-                ys = self._ys[iq] * variables["unit"]
+                ys = self._frequencies[iq] * variables["unit"]
 
             lines = ax.plot(
                 xs,

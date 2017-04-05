@@ -31,11 +31,11 @@ class PointsSFIRsPlotter(PointsSFPlotter):
             sf_symbol = self._data_points[iq]['partial_sf_s'][:, index]
 
             if self._is_horizontal:
-                xs = self._ys[iq] * variables["unit"]
+                xs = self._frequencies[iq] * variables["unit"]
                 ys = sf_symbol
             else:
                 xs = sf_symbol
-                ys = self._ys[iq] * variables["unit"]
+                ys = self._frequencies[iq] * variables["unit"]
 
             linewidth = variables["linewidth"]
             lines = ax.plot(

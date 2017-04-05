@@ -66,33 +66,13 @@ class SFPlotter(Plotter):
             self._distances = np.array(distances)
 
         xs = self._distances.reshape(-1) / np.nanmax(self._distances)
-        self._ys, self._xs = np.meshgrid(frequencies, xs)
+        self._frequencies, self._xs = np.meshgrid(frequencies, xs)
 
         print("Finished")
 
         band_labels = read_band_labels("band.conf")
         print("band_labels:", band_labels)
         self._band_labels = band_labels
-
-    def load_density(self, filename="density.dat"):
-        tmp = np.loadtxt(filename).T
-        xs = tmp[0]
-        ys = tmp[1]
-        zs = tmp[2]
-        n1, n2 = self._distances.shape
-        n = n1 * n2
-        self._xs = xs.reshape(n, -1)
-        self._ys = ys.reshape(n, -1)
-        self._zs = zs.reshape(n, -1)
-
-        self._fwidth = self._ys[0, 1] - self._ys[0, 0]
-
-        if len(tmp) > 3:
-            partial_density = tmp[3:]
-            ncol = len(partial_density)
-            self._partial_sf = partial_density.reshape(ncol, n, -1)
-        else:
-            self._partial_sf = None
 
     def load_spectral_functions_single(
             self,
@@ -111,7 +91,7 @@ class SFPlotter(Plotter):
         total_sf = tmp[2]
 
         self._xs = xs.reshape(nq, -1) / np.nanmax(xs)
-        self._ys = ys.reshape(nq, -1)
+        self._frequencies = ys.reshape(nq, -1)
         self._total_sf = total_sf.reshape(nq, -1)
 
         if len(tmp) > 3:
@@ -182,7 +162,7 @@ class SFPlotter(Plotter):
         xs = np.array(xs)
 
         self._xs = xs / np.nanmax(xs)
-        self._ys = np.array(ys)
+        self._frequencies = np.array(ys)
         self._total_sf = np.array(total_sf)
 
         self._pg_symbols = np.array(pg_symbols)

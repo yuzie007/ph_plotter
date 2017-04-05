@@ -93,7 +93,7 @@ class BandSFPlotter(SFPlotter):
 
     def _plot_sf_pre(self, ax, sf):
         distances = self._xs
-        frequencies = self._ys
+        frequencies = self._frequencies
 
         distances, frequencies, sf = self.modify_data(
             distances, frequencies, sf)
