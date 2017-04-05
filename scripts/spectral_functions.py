@@ -12,9 +12,9 @@ __author__ = "Yuji Ikeda"
 def run(variables):
     sf_with = variables.pop("sf_with")
 
-    if sf_with == "elements":
-        from ph_plotter.points_sf_elements_plotter import (
-            PointsSFElementsPlotter as PointsSFPlotter)
+    if sf_with == "e1":
+        from ph_plotter.points_sf_e1_plotter import (
+            PointsSFE1Plotter as PointsSFPlotter)
 
     elif sf_with == "e2":
         from ph_plotter.points_sf_e2_plotter import (
@@ -41,7 +41,7 @@ def main():
                         help="Filename of data.")
     parser.add_argument("--sf_with",
                         type=str,
-                        choices=["elements", "e2", "irs", "atoms"],
+                        choices=["e1", "e2", "irs", "atoms"],
                         required=True,
                         help="To be plotted with the total spectral functions.")
     parser.add_argument("--selected_irreps",

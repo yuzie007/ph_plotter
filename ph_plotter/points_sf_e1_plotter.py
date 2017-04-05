@@ -9,7 +9,7 @@ from ph_plotter.points_sf_plotter import PointsSFPlotter
 __author__ = "Yuji Ikeda"
 
 
-class PointsSFElementsPlotter(PointsSFPlotter):
+class PointsSFE1Plotter(PointsSFPlotter):
     def plot_q(self, ax, iq):
         selected_irreps = self._variables['selected_irreps']
         if selected_irreps is None:
@@ -44,10 +44,8 @@ class PointsSFElementsPlotter(PointsSFPlotter):
         return
 
     def plot_q_selected_irreps_total(self, ax, iq, irs_selected):
-        from .attributes import colors, tuple_dashes
 
         variables = self._variables
-        elements = self._data_points[iq]['elements']
 
         data_point = self._data_points[iq]
 
@@ -122,7 +120,7 @@ class PointsSFElementsPlotter(PointsSFPlotter):
 
     def create_figure_name(self):
         variables = self._variables
-        figure_name = "points_sf_elements_{}.{}".format(
+        figure_name = "points_sf_e1_{}.{}".format(
             variables["freq_unit"],
             variables["figure_type"])
         return figure_name
