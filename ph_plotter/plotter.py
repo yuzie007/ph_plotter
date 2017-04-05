@@ -114,6 +114,7 @@ class Plotter(object):
             "combinations_elements": None,
             "elements": None,
             "points": None,
+            "is_filled": False,
         }
 
     def update_variables(self, variables):

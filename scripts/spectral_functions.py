@@ -51,6 +51,9 @@ def main():
                         nargs='+',
                         type=int,
                         help="Points to be plotted")
+    parser.add_argument("--fill", dest='is_filled',
+                        action='store_true',
+                        help='Partial SFs are filled by color.')
     args = parser.parse_args()
 
     print(vars(args))

@@ -73,6 +73,7 @@ class PointsSFPlotter(SFPlotter):
                 ax.legend()
                 pdf.savefig(dpi=288, transparent=True)
                 ax.clear()
+                self._reset_prop_cycle(ax)
 
         self.close()
 
@@ -101,6 +102,28 @@ class PointsSFPlotter(SFPlotter):
         )
 
         return lines_total
+
+    def _plot_curve(self, ax, iq, sf, label):
+        variables = self._variables
+
+        if self._is_horizontal:
+            xs = self._frequencies[iq] * variables["unit"]
+            ys = sf
+        else:
+            xs = sf
+            ys = self._frequencies[iq] * variables["unit"]
+
+        linewidth = self._variables["linewidth"]
+        lines = ax.plot(
+            xs,
+            ys,
+            linewidth=linewidth,
+            label=label,
+        )
+        if variables['is_filled']:
+            # TODO(ikeda): So far this is only for the vertical plot.
+            ax.fill_between(xs, ys, alpha=0.25)
+        return lines
 
     def create_list_element_indices(self):
         from phonopy.interface.vasp import read_vasp
