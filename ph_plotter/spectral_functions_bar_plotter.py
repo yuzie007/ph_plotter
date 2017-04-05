@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
-from ph_plotter.plotter import Plotter
+from ph_plotter.points_sf_plotter import PointsSFPlotter
 from ph_plotter.file_io import read_band_hdf5_dict
 
 
-class SpectralFunctionsPlotter(Plotter):
+__author__ = "Yuji Ikeda"
+
+
+class SpectralFunctionsPlotter(PointsSFPlotter):
     def load_data(self, data_file="band.hdf5"):
         print("Reading band.hdf5: ", end="")
         data = read_band_hdf5_dict(data_file)
@@ -54,50 +54,6 @@ class SpectralFunctionsPlotter(Plotter):
         sf_filename = data_file.replace(
             "band.hdf5", "spectral_functions_atoms.dat")
         return sf_filename
-
-    def configure(self, ax):
-        variables = self._variables
-
-        freq_label = "Frequency ({})".format(variables["freq_unit"])
-        d_freq = variables["d_freq"]
-        f_min = variables["f_min"]
-        f_max = variables["f_max"]
-        n_freq = int(round((f_max - f_min) / d_freq)) + 1
-
-        sf_label = "Spectral function (/{})".format(variables["freq_unit"])
-        sf_min = variables["sf_min"]
-        sf_max = variables["sf_max"]
-        d_sf = variables["d_sf"]
-        nticks_sf = int(sf_max / float(d_sf)) + 1
-
-        mlx = AutoMinorLocator(2)
-        ax.xaxis.set_minor_locator(mlx)
-        mly = AutoMinorLocator(2)
-        ax.yaxis.set_minor_locator(mly)
-
-        # zero axis
-        ax.axvline(0, color="k", dashes=(2, 2), linewidth=0.5)
-        ax.axhline(0, color="k", dashes=(2, 2), linewidth=0.5)
-
-        if self._is_horizontal:
-
-            ax.set_xticks(np.linspace(f_min, f_max, n_freq))
-            ax.set_xlabel(freq_label)
-            ax.set_xlim(f_min, f_max)
-
-            ax.set_yticks(np.linspace(sf_min, sf_max, nticks_sf))
-            ax.set_ylabel(sf_label)
-            ax.set_ylim(sf_min, sf_max)
-
-        else:
-
-            ax.set_yticks(np.linspace(f_min, f_max, n_freq))
-            ax.set_ylabel(freq_label)
-            ax.set_ylim(f_min, f_max)
-
-            ax.set_xticks(np.linspace(sf_min, sf_max, nticks_sf))
-            ax.set_xlabel(sf_label)
-            ax.set_xlim(sf_min, sf_max)
 
     def plot(self, ax):
         self._fwidth = self._ys[0, 1] - self._ys[0, 0]
@@ -142,34 +98,15 @@ class SpectralFunctionsPlotter(Plotter):
         return lines_total
 
     def plot_elements_q(self, ax, iq):
-        from ph_plotter.attributes import colors, tuple_dashes
 
-        variables = self._variables
-        lines_symbols = []
         for counter, element_indices in enumerate(self._list_element_indices):
             element_label, indices = element_indices
-            freqs = make_steplike(self._ys[iq], self._fwidth)
             sf_symbol = np.sum(self._partial_density[indices, iq], axis=0)
             sf_symbol = make_steplike(sf_symbol, 0.0)
 
-            if self._is_horizontal:
-                xs = freqs * variables["unit"]
-                ys = sf_symbol
-            else:
-                xs = sf_symbol
-                ys = freqs * variables["unit"]
+            self._plot_curve(ax, iq, sf_symbol, label=element_label)
 
-            lines = ax.plot(
-                xs,
-                ys,
-                color=colors[counter % len(colors)],
-                dashes=tuple_dashes[counter % len(tuple_dashes)],
-                linewidth=variables["linewidth"],
-                label=element_label,
-            )
-            lines_symbols.append(lines)
-
-        return lines_symbols
+        return
 
     def create_list_element_indices(self):
         from phonopy.interface.vasp import read_vasp
