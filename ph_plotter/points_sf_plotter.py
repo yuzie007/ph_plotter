@@ -58,8 +58,12 @@ class PointsSFPlotter(SFPlotter):
 
     def plot(self, ax):
         figure_name = self.create_figure_name()
+        if self._variables['points'] is not None:
+            indices = self._variables['points']
+        else:
+            indices = range(len(self._xs))
         with PdfPages(figure_name) as pdf:
-            for iq, x in enumerate(self._xs):
+            for iq in indices:
                 print(iq, self._data_points[iq]['pointgroup_symbol'])
                 lines_total, lines_symbols = self.plot_q(ax, iq)
                 ax.legend(framealpha=0.5)

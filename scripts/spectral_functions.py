@@ -47,6 +47,10 @@ def main():
     parser.add_argument("--selected_irreps",
                         type=json.loads,
                         help="Specification of Small Reps. ex. {'mm2': ['B2']}")
+    parser.add_argument("--points",
+                        nargs='+',
+                        type=int,
+                        help="Points to be plotted")
     args = parser.parse_args()
 
     print(vars(args))
