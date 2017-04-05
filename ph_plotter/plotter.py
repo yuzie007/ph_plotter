@@ -149,23 +149,27 @@ class Plotter(object):
     def create_figure_name(self):
         raise NotImplementedError
 
-    def create_figure(self):
-        variables = self._variables
-
+    def prepare_figure(self):
         self.update_rcParams()
-
         fig, ax = plt.subplots(
             1, 1,
-            figsize=variables["figsize"],
+            figsize=self._variables["figsize"],
             frameon=False,
             tight_layout=True)
+        return fig, ax
+
+    def close(self):
+        plt.close()
+
+    def create_figure(self):
+        fig, ax = self.prepare_figure()
+        figure_name = self.create_figure_name()
 
         self.configure(ax)
         self.plot(ax)
-
-        figure_name = self.create_figure_name()
         self.save_figure(fig, figure_name)
-        plt.close()
+
+        self.close()
 
     def save_figure(self, fig, figure_name):
         fig.savefig(figure_name, transparent=True)

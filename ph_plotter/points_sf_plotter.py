@@ -56,24 +56,25 @@ class PointsSFPlotter(SFPlotter):
             ax.set_xlabel(sf_label)
             ax.set_xlim(sf_min, sf_max)
 
-    def plot(self, ax):
+    def create_figure(self):
+        fig, ax = self.prepare_figure()
         figure_name = self.create_figure_name()
+
         if self._variables['points'] is not None:
             indices = self._variables['points']
         else:
             indices = range(len(self._xs))
+
         with PdfPages(figure_name) as pdf:
             for iq in indices:
                 print(iq, self._data_points[iq]['pointgroup_symbol'])
-                lines_total, lines_symbols = self.plot_q(ax, iq)
-                ax.legend(framealpha=0.5)
+                self.configure(ax)
+                self.plot_q(ax, iq)
+                ax.legend()
                 pdf.savefig(dpi=288, transparent=True)
+                ax.clear()
 
-                if lines_total is not None:
-                    lines_total[0].remove()
-                if lines_symbols is not None:
-                    for lines in lines_symbols:
-                        lines[0].remove()
+        self.close()
 
     def plot_q(self, ax, iq):
         raise NotImplementedError
@@ -131,9 +132,6 @@ class PointsSFPlotter(SFPlotter):
             expanded_list_element_indices.append((s, indices))
 
         self._list_element_indices = expanded_list_element_indices
-
-    def save_figure(self, fig, figure_name):
-        pass
 
     @staticmethod
     def _modify_dashes_by_linewidth(dashes, linewidth):
