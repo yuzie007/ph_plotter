@@ -103,7 +103,7 @@ class PointsSFPlotter(SFPlotter):
 
         return lines_total
 
-    def _plot_curve(self, ax, iq, sf, label):
+    def _plot_curve(self, ax, iq, sf, label, **kwargs):
         variables = self._variables
 
         if self._is_horizontal:
@@ -119,10 +119,11 @@ class PointsSFPlotter(SFPlotter):
             ys,
             linewidth=linewidth,
             label=label,
+            **kwargs
         )
         if variables['is_filled']:
             # TODO(ikeda): So far this is only for the vertical plot.
-            ax.fill_between(xs, ys, alpha=0.25)
+            ax.fill_between(xs, ys, alpha=0.25, **kwargs)
         return lines
 
     def create_list_element_indices(self):
