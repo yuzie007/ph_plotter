@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
 from .plotter import Plotter
+
+
+__author__ = "Yuji Ikeda"
 
 
 class DOSPlotter(Plotter):
@@ -105,7 +105,7 @@ class DOSPlotter(Plotter):
     def plot_dos_total(self, ax):
         variables = self._variables
 
-        dos_total = np.sum(self._dos_list, axis=0)
+        dos_total = self.create_dos_total()
         lines = ax.plot(
             dos_total / (variables["unit"] * variables["natoms"] * 3),
             self._frequencies * variables["unit"],
@@ -123,6 +123,50 @@ class DOSPlotter(Plotter):
         # plotting procedure, this should not do anything.
         pass
 
+    def create_dos_total(self):
+        dos_total = np.sum(self._dos_list, axis=0)
+        return dos_total
+
+    def create_dos_symbol(self, s):
+        variables = self._variables
+
+        indices = [i for i, x in enumerate(variables["symbols"]) if x == s]
+        print(s, indices)
+        dos_symbol = np.sum(self._dos_list[indices], axis=0)
+
+        return dos_symbol
+
+    def print_dos_symbols(self):
+        variables = self._variables
+
+        symbols = variables["symbols"]
+        reduced_symbols = sorted(set(symbols), key=symbols.index)
+        print(reduced_symbols)
+
+        dos_total = self.create_dos_total()
+        dos_total_scaled = dos_total / (variables['unit'] * variables['natoms'] * 3)
+        dos_symbols = []
+        for i, s in enumerate(reduced_symbols):
+            dos_symbols.append(self.create_dos_symbol(s))
+        dos_symbols_scaled = np.array(dos_symbols) / (variables['unit'] * variables['natoms'] * 3)
+
+        frequencies_scaled = self._frequencies * variables['unit']
+
+        with open('partial_dos_E.dat', 'w') as f:
+            # header
+            f.write('# Freq. (THz)   ')
+            f.write('Total           ')
+            for s in reduced_symbols:
+                f.write('{:20.10s}'.format(s))
+            f.write('\n')
+
+            for ifreq, freq in enumerate(frequencies_scaled):
+                f.write('{:16.8f}'.format(freq))
+                f.write('{:16.8f}'.format(dos_total_scaled[ifreq]))
+                for i, s in enumerate(reduced_symbols):
+                    f.write('{:16.8f}'.format(dos_symbols_scaled[i][ifreq]))
+                f.write('\n')
+
     def plot_dos_symbols(self, ax):
         symbols = self._variables["symbols"]
         reduced_symbols = sorted(set(symbols), key=symbols.index)
@@ -137,9 +181,7 @@ class DOSPlotter(Plotter):
     def plot_dos_symbol(self, ax, s):
         variables = self._variables
 
-        indices = [i for i, x in enumerate(variables["symbols"]) if x == s]
-        print(s, indices)
-        dos_symbol = np.sum(self._dos_list[indices], axis=0)
+        dos_symbol = self.create_dos_symbol(s)
         lines = ax.plot(
             dos_symbol / (variables["unit"] * variables["natoms"] * 3),
             self._frequencies * variables["unit"],
