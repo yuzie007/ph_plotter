@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+from .dos_plotter import DOSPlotter
+
 
 __author__ = "Yuji Ikeda"
-
-from units import THz2meV
-from .dos_plotter import DOSPlotter
 
 
 class PartialDOSPlotter(DOSPlotter):
@@ -43,12 +42,15 @@ class PartialDOSPlotter(DOSPlotter):
 
         return
 
+        from scipy.constants import eV, Planck
+        THz2meV = Planck / eV * 1e+15  # 4.135667662340164
+
         # meV
-        scale = 4.0
         variables.update({
             "freq_unit": "meV",
             "unit": THz2meV,
         })
+        scale = 4.0
         variables["f_min"]  *= scale
         variables["f_max"]  *= scale
         variables["d_freq"] *= scale
