@@ -14,6 +14,18 @@ __author__ = "Yuji Ikeda"
 
 class SFPlotter(Plotter):
     def load_data(self, data_file='sf.hdf5'):
+        _, extension = os.path.split(data_file)
+        if extension == 'hdf5':
+            self.load_data_hdf5(data_file)
+        else:
+            self.load_data_text(data_file)
+        print("Finished")
+
+        band_labels = read_band_labels("band.conf")
+        print("band_labels:", band_labels)
+        self._band_labels = band_labels
+
+    def load_data_hdf5(self, data_file='sf.hdf5'):
         with h5py.File(data_file, 'r') as data:
             self._paths = np.array(data['paths'])
             npaths, npoints = self._paths.shape[:2]
@@ -55,11 +67,22 @@ class SFPlotter(Plotter):
         xs = self._distances.reshape(-1) / np.nanmax(self._distances)
         self._frequencies, self._xs = np.meshgrid(frequencies, xs)
 
-        print("Finished")
+    def load_data_text(self, data_file):
+        data = np.loadtxt(data_file, usecols=(0, 1, 2)).T
+        nfreq = len(np.unique(data[1]))
+        xs                = data[0].reshape(-1, nfreq)
+        self._frequencies = data[1].reshape(-1, nfreq)
+        total_sf          = data[2].reshape(-1, nfreq)
+        data_points = []
+        for total_sf_point in total_sf:
+            data_points.append({'total_sf': total_sf_point})
+        self._data_points = data_points
 
-        band_labels = read_band_labels("band.conf")
-        print("band_labels:", band_labels)
-        self._band_labels = band_labels
+        distances = xs[:, 0]
+        npaths = len(distances) - len(np.unique(distances)) + 1
+        self._distances = distances.reshape(npaths, -1)
+
+        self._xs = xs / np.nanmax(self._distances)
 
     @staticmethod
     def _check_is_squared(filename):
