@@ -14,8 +14,8 @@ __author__ = "Yuji Ikeda"
 
 class SFPlotter(Plotter):
     def load_data(self, data_file='sf.hdf5'):
-        _, extension = os.path.split(data_file)
-        if extension == 'hdf5':
+        _, extension = os.path.splitext(data_file)
+        if extension == '.hdf5':
             self.load_data_hdf5(data_file)
         else:
             self.load_data_text(data_file)
