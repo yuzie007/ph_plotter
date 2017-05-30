@@ -40,21 +40,21 @@ def convert_white_to_transparent(color_list):
 
 
 class ColormapCreator(object):
-    def __init__(self, color_p='r', color_n='w', alpha=1.0, is_transparent_gradient=False):
-        if isinstance(color_p, basestring):
-            color_p = [color_p]
-        if isinstance(color_n, basestring):
-            color_n = [color_n]
+    def __init__(self, colors_p='r', colors_n='w', alpha=1.0, is_transparent_gradient=False):
+        if isinstance(colors_p, basestring):
+            colors_p = [colors_p]
+        if isinstance(colors_n, basestring):
+            colors_n = [colors_n]
 
         if is_transparent_gradient:
-            color_zero = list(ColorConverter().to_rgba(color_p[-1]))
+            color_zero = list(ColorConverter().to_rgba(colors_p[-1]))
             color_zero[3] = 0.0
         else:
             color_zero = (1.0, 1.0, 1.0, alpha)
         color_zero = [color_zero]
 
-        self._colors_p = color_zero + color_p
-        self._colors_n = color_n + color_zero
+        self._colors_p = color_zero + colors_p
+        self._colors_n = colors_n + color_zero
 
     def create_colormap_old_2(self, values, prec=1e-6):
         color_p = self._color_p

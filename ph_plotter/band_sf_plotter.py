@@ -50,8 +50,8 @@ class BandSFPlotter(SFPlotter):
         ax.axhline(0, color="#b0b0b0", linewidth=0.8, zorder=1)
 
         cmap_creator = ColormapCreator(
-            color_p=variables["colormap_p"],
-            color_n=variables["colormap_n"],
+            colors_p=variables["colormap_p"],
+            colors_n=variables["colormap_n"],
             alpha=variables["alpha"],
             is_transparent_gradient=variables["is_transparent_gradient"],
         )

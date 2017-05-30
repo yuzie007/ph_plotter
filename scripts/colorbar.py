@@ -20,8 +20,8 @@ class Colorbar(object):
 
     def create_colormap(self):
         colormap_creator = ColormapCreator(
-            color_p=self._colors_p,
-            color_n=self._colors_n,
+            colors_p=self._colors_p,
+            colors_n=self._colors_n,
         )
         self._create_bounds()
         cmap = colormap_creator.create_colormap(ticks=self._bounds)
