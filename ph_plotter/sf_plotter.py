@@ -8,8 +8,17 @@ import numpy as np
 from ph_plotter.plotter import Plotter
 from ph_plotter.plotter import read_band_labels
 
-
 __author__ = "Yuji Ikeda"
+
+
+def convert_binary2string(x):
+    """x: numpy.array"""
+    if isinstance(x, np.ndarray) and x.shape != ():
+        return [convert_binary2string(_) for _ in x]
+    else:
+        # The "bytes" function is necessary because
+        # numpy.bytes_ does not have the decode method.
+        return bytes(x).decode('ascii')
 
 
 class SFPlotter(Plotter):
@@ -27,8 +36,8 @@ class SFPlotter(Plotter):
 
     def load_data_hdf5(self, data_file='sf.hdf5'):
         with h5py.File(data_file, 'r') as data:
-            self._paths = np.array(data['paths'])
-            npaths, npoints = self._paths.shape[:2]
+            paths = np.array(data['paths'])
+            npaths, npoints = paths.shape[:2]
 
             frequencies = np.array(data['frequencies'])
             self._is_squared = np.array(data['is_squared'])
@@ -61,11 +70,19 @@ class SFPlotter(Plotter):
                         np.array(data[group + 'distance']))
                 distances.append(distances_on_path)
 
+            data_points = [self.convert_binary2string(d) for d in data_points]
             self._data_points = data_points
             self._distances = np.array(distances)
 
         xs = self._distances.reshape(-1) / np.nanmax(self._distances)
         self._frequencies, self._xs = np.meshgrid(frequencies, xs)
+
+    @staticmethod
+    def convert_binary2string(data_point):
+        keys = ['elements', 'pointgroup_symbol', 'ir_labels']
+        for key in keys:
+            data_point[key] = convert_binary2string(data_point[key])
+        return data_point
 
     def load_data_text(self, data_file):
         data = np.loadtxt(data_file, usecols=(0, 1, 2)).T

@@ -129,9 +129,11 @@ class BandSFPlotter(SFPlotter):
             pg_symbol = str(data_point['pointgroup_symbol'])
             if pg_symbol in irs_selected:
                 for ir_label_selected in irs_selected[pg_symbol]:
-                    indices = np.where(ir_labels == ir_label_selected)
-                    for index in indices:
-                        partial_sf[i] += data_point['partial_sf_s'][:, index[0]]
+                    # The following is not used anymore to avoid
+                    # the possible unicode-related issue in numpy.
+                    # indices = np.where(ir_labels == ir_label_selected)
+                    indices = [j for j, x in enumerate(ir_labels) if x == ir_label_selected]
+                    partial_sf[i] += np.sum(data_point['partial_sf_s'][:, indices], axis=-1)
         return partial_sf
 
     def _create_selected_sf_irs_and_elements(self, irs_selected, combinations_elements):
