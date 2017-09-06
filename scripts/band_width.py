@@ -18,7 +18,7 @@ def main():
     parser = argparse.ArgumentParser()
     CommonArgumentsAdder().add_common_arguments(parser)
     parser.add_argument("--data_file",
-                        default="sf_fitted.hdf5",
+                        default="sf_fit.hdf5",
                         type=str,
                         help="Filename of data.")
     args = parser.parse_args()

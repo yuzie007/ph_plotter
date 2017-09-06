@@ -2,19 +2,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import h5py
 import numpy as np
 from .band_plotter import BandPlotter
 from .plotter import read_band_labels
 from ph_unfolder.irreps.irreps import extract_degeneracy_from_ir_label
 
+__author__ = 'Yuji Ikeda'
+
 
 # TODO(ikeda): Sort also ir_labels
 class BandWidthPlotter(BandPlotter):
-    def load_data(self, data_file="sf_fitted.hdf5"):
+    def load_data(self, data_file="sf_fit.hdf5"):
         print("Reading data_file: ", end="")
         with h5py.File(data_file, 'r') as data:
             self._paths = np.array(data['paths'])
@@ -39,28 +38,33 @@ class BandWidthPlotter(BandPlotter):
                 frequencies_on_path = []
                 widths_on_path = []
                 for ip in range(npoints):
-                    group = '{}/{}/'.format(ipath, ip)
+                    group_name = '{}/{}/'.format(ipath, ip)
+                    group = data[group_name]
                     data_points.append(
-                        {k: np.array(data[group + k]) for k in keys}
+                        {k: group[k][...] for k in keys}
                     )
 
-                    distances_on_path.append(np.array(data[group + 'distance']))
+                    distances_on_path.append(group['distance'][...])
 
-                    indices_nonzero = np.where(np.isfinite(data[group + 'norms_s']))
-                    ir_labels = np.array(data[group + 'ir_labels'])
+                    indices_nonzero = np.where(np.isfinite(group['norms_s']))
+                    ir_labels = group['ir_labels'][...]
 
-                    frequencies_on_point = []
-                    widths_on_point = []
+                    nbands = 3 * group['natoms_primitive'][...]
+
+                    frequencies_on_point = np.full(nbands, np.nan)
+                    widths_on_point = np.full(nbands, np.nan)
+                    j = 0
                     for index in indices_nonzero[0]:
                         degeneracy = extract_degeneracy_from_ir_label(ir_labels[index])
                         for i in range(degeneracy):
-                            frequencies_on_point.append(np.array(data[group + 'peaks_s' ])[index])
-                            widths_on_point     .append(np.array(data[group + 'widths_s'])[index])
+                            frequencies_on_point[j] = group['peaks_s' ][index]
+                            widths_on_point     [j] = group['widths_s'][index]
+                            j += 1
 
                     indices_sort = np.argsort(frequencies_on_point)
 
-                    frequencies_on_path.append(np.array(frequencies_on_point)[indices_sort])
-                    widths_on_path     .append(np.array(widths_on_point     )[indices_sort])
+                    frequencies_on_path.append(frequencies_on_point[indices_sort])
+                    widths_on_path     .append(widths_on_point     [indices_sort])
 
                 distances.append(distances_on_path)
                 frequencies.append(frequencies_on_path)
@@ -68,13 +72,12 @@ class BandWidthPlotter(BandPlotter):
         print("Finished")
 
         distances   = np.array(distances)
-        frequencies = np.array(frequencies)
         widths      = np.array(widths)
 
         self._data_points = data_points
 
         self._distances = distances / distances[-1, -1]
-        self._frequencies = frequencies
+        self._frequencies = np.asarray(frequencies)
         self._bandwidths = widths
 
         band_labels = read_band_labels("band.conf")
