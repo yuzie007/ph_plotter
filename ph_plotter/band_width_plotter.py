@@ -47,21 +47,21 @@ class BandWidthPlotter(BandPlotter):
                     distances_on_path.append(group['distance'][...])
 
                     indices_nonzero = np.where(np.isfinite(group['norms_s']))
-                    ir_labels = group['ir_labels'][...]
 
-                    nbands = 3 * group['natoms_primitive'][...]
-
-                    frequencies_on_point = np.full(nbands, np.nan)
-                    widths_on_point = np.full(nbands, np.nan)
-                    j = 0
+                    frequencies_on_point = []
+                    widths_on_point = []
                     for index in indices_nonzero[0]:
-                        degeneracy = extract_degeneracy_from_ir_label(ir_labels[index])
+                        ir_label = str(group['ir_labels'][index], encoding='ascii')
+                        degeneracy = extract_degeneracy_from_ir_label(ir_label)
                         for i in range(degeneracy):
-                            frequencies_on_point[j] = group['peaks_s' ][index]
-                            widths_on_point     [j] = group['widths_s'][index]
-                            j += 1
+                            frequencies_on_point.append(group['peaks_s' ][index])
+                            widths_on_point     .append(group['widths_s'][index])
+
+                    frequencies_on_point = np.asarray(frequencies_on_point)
+                    widths_on_point      = np.asarray(widths_on_point)
 
                     indices_sort = np.argsort(frequencies_on_point)
+                    # print(indices_sort, frequencies_on_point)
 
                     frequencies_on_path.append(frequencies_on_point[indices_sort])
                     widths_on_path     .append(widths_on_point     [indices_sort])
