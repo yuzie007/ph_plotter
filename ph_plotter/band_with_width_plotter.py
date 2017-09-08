@@ -12,7 +12,7 @@ __author__ = 'Yuji Ikeda'
 
 
 # TODO(ikeda): Sort also ir_labels
-class BandWidthPlotter(BandPlotter):
+class BandWithWidthPlotter(BandPlotter):
     def load_data(self, data_file="sf_fit.hdf5"):
         print("Reading data_file: ", end="")
         with h5py.File(data_file, 'r') as data:
@@ -33,10 +33,12 @@ class BandWidthPlotter(BandPlotter):
             distances = []
             frequencies = []
             widths = []
+            fiterrs = []
             for ipath in range(npaths):
                 distances_on_path = []
                 frequencies_on_path = []
                 widths_on_path = []
+                fiterrs_on_path = []
                 for ip in range(npoints):
                     group_name = '{}/{}/'.format(ipath, ip)
                     group = data[group_name]
@@ -50,25 +52,30 @@ class BandWidthPlotter(BandPlotter):
 
                     frequencies_on_point = []
                     widths_on_point = []
+                    fiterrs_on_point = []
                     for index in indices_nonzero[0]:
                         ir_label = str(group['ir_labels'][index], encoding='ascii')
                         degeneracy = extract_degeneracy_from_ir_label(ir_label)
                         for i in range(degeneracy):
                             frequencies_on_point.append(group['peaks_s' ][index])
                             widths_on_point     .append(group['widths_s'][index])
+                            fiterrs_on_point.append(group['fitting_errors'][index])
 
                     frequencies_on_point = np.asarray(frequencies_on_point)
                     widths_on_point      = np.asarray(widths_on_point)
+                    fiterrs_on_point     = np.asarray(fiterrs_on_point)
 
                     indices_sort = np.argsort(frequencies_on_point)
                     # print(indices_sort, frequencies_on_point)
 
                     frequencies_on_path.append(frequencies_on_point[indices_sort])
                     widths_on_path     .append(widths_on_point     [indices_sort])
+                    fiterrs_on_path    .append(fiterrs_on_point    [indices_sort])
 
                 distances.append(distances_on_path)
                 frequencies.append(frequencies_on_path)
                 widths.append(widths_on_path)
+                fiterrs.append(fiterrs_on_path)
         print("Finished")
 
         distances   = np.array(distances)
@@ -79,6 +86,7 @@ class BandWidthPlotter(BandPlotter):
         self._distances = distances / distances[-1, -1]
         self._frequencies = np.asarray(frequencies)
         self._bandwidths = widths
+        self._fiterrs = np.asarray(fiterrs)
 
         band_labels = read_band_labels("band.conf")
         print("band_labels:", band_labels)

@@ -9,8 +9,8 @@ from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 
 def run(variables):
-    from ph_plotter.band_width_plotter import BandWidthPlotter
-    BandWidthPlotter(variables).run()
+    from ph_plotter.band_with_width_plotter import BandWithWidthPlotter
+    BandWithWidthPlotter(variables).run()
 
 
 def main():
