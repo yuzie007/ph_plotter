@@ -12,7 +12,7 @@ __author__ = 'Yuji Ikeda'
 
 
 # TODO(ikeda): Sort also ir_labels
-class BandWithWidthPlotter(BandPlotter):
+class BandWidthPlotter(BandPlotter):
     def load_data(self, data_file="sf_fit.hdf5"):
         print("Reading data_file: ", end="")
         with h5py.File(data_file, 'r') as data:

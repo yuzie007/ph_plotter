@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-from .band_with_width_plotter import BandWithWidthPlotter
+from .band_width_plotter import BandWidthPlotter
 
 __author__ = 'Yuji Ikeda'
 
 
-class BandFittingErrorPlotter(BandWithWidthPlotter):
+class BandFittingErrorPlotter(BandWidthPlotter):
     def plot(self, ax):
         variables = self._variables
         distances = self._distances
