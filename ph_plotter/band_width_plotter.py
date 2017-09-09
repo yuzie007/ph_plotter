@@ -13,6 +13,13 @@ __author__ = 'Yuji Ikeda'
 
 # TODO(ikeda): Sort also ir_labels
 class BandWidthPlotter(BandPlotter):
+    def __init__(self, *args, **kwargs):
+        super(BandWidthPlotter, self).__init__(*args, **kwargs)
+        self._set_is_sorted()
+
+    def _set_is_sorted(self):
+        self._is_sorted = True
+
     def load_data(self, data_file="sf_fit.hdf5"):
         print("Reading data_file: ", end="")
         with h5py.File(data_file, 'r') as data:
@@ -61,16 +68,16 @@ class BandWidthPlotter(BandPlotter):
                             widths_on_point     .append(group['widths_s'][index])
                             fiterrs_on_point.append(group['fitting_errors'][index])
 
-                    frequencies_on_point = np.asarray(frequencies_on_point)
-                    widths_on_point      = np.asarray(widths_on_point)
-                    fiterrs_on_point     = np.asarray(fiterrs_on_point)
+                    if self._is_sorted:
+                        frequencies_on_point, widths_on_point, fiterrs_on_point = self._sort_data(
+                            frequencies_on_point,
+                            widths_on_point,
+                            fiterrs_on_point,
+                        )
 
-                    indices_sort = np.argsort(frequencies_on_point)
-                    # print(indices_sort, frequencies_on_point)
-
-                    frequencies_on_path.append(frequencies_on_point[indices_sort])
-                    widths_on_path     .append(widths_on_point     [indices_sort])
-                    fiterrs_on_path    .append(fiterrs_on_point    [indices_sort])
+                    frequencies_on_path.append(frequencies_on_point)
+                    widths_on_path     .append(widths_on_point     )
+                    fiterrs_on_path    .append(fiterrs_on_point    )
 
                 distances.append(distances_on_path)
                 frequencies.append(frequencies_on_path)
@@ -93,6 +100,19 @@ class BandWidthPlotter(BandPlotter):
         self._band_labels = band_labels
 
         return self
+
+    def _sort_data(self, frequencies, widths, fiterrs):
+        frequencies = np.asarray(frequencies)
+        widths      = np.asarray(widths)
+        fiterrs     = np.asarray(fiterrs)
+
+        indices = np.argsort(frequencies)
+
+        frequencies = frequencies[indices]
+        widths      = widths     [indices]
+        fiterrs     = fiterrs    [indices]
+
+        return frequencies, widths, fiterrs
 
     def plot(self, ax):
         variables = self._variables
@@ -143,8 +163,4 @@ class BandWidthPlotter(BandPlotter):
         )
 
     def create_figure_name(self):
-        variables = self._variables
-        figure_name = "band_{}.{}".format(
-            variables["freq_unit"],
-            variables["figure_type"])
-        return figure_name
+        return "band_width.{}".format(self._variables["figure_type"])
