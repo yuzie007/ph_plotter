@@ -13,12 +13,15 @@ class BandFittingErrorPlotter(BandWidthPlotter):
         distances = self._distances
         fiterrs = self._fiterrs
 
-        npath, nqpoint, nband = fiterrs.shape
-        for ipath in range(npath):
-            lines = ax.plot(
-                distances[ipath],
-                fiterrs[ipath] / variables["unit"],
-                # variables["linecolor"],
-                # dashes=variables["dashes"],
-            )
+        nq, nband = fiterrs.shape
+        lines = ax.plot(
+            distances.flatten(),
+            fiterrs / variables["unit"],
+            # variables["linecolor"],
+            # dashes=variables["dashes"],
+        )
         ax.set_ylabel('')
+        return lines
+
+    def create_figure_name(self):
+        return "band_fitting_error.{}".format(self._variables["figure_type"])

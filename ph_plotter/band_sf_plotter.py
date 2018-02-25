@@ -113,6 +113,10 @@ class BandSFPlotter(SFPlotter):
         sf = self._create_selected_sf_irs(irs_selected)
         self._plot_sf_pre(ax, sf)
 
+    def plot_sf_elements(self, ax, elements):
+        sf = self._create_selected_sf_e2(elements)
+        self._plot_sf_pre(ax, sf)
+
     def plot_sf_combinations_elements(self, ax, combinations_elements):
         sf = self._create_selected_sf_elements(combinations_elements)
         self._plot_sf_pre(ax, sf)

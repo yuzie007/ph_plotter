@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
+import json
 from ph_plotter.common_arguments_adder import CommonArgumentsAdder
 
 __author__ = 'Yuji Ikeda'
@@ -20,6 +21,9 @@ def main():
                         default="sf_fit.hdf5",
                         type=str,
                         help="Filename of data.")
+    parser.add_argument("--selected_irreps",
+                        type=json.loads,
+                        help="Specification of Small Reps. ex. {'mm2': ['B2']}")
     args = parser.parse_args()
 
     print(vars(args))

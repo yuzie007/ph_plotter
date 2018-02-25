@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 from ph_plotter.common_arguments_adder import CommonArgumentsAdder
+
+__author__ = 'Yuji Ikeda'
 
 
 def run(variables):
