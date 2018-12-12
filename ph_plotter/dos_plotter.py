@@ -3,7 +3,7 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 import numpy as np
-from matplotlib.ticker import AutoMinorLocator
+from matplotlib.ticker import MultipleLocator, AutoMinorLocator
 from matplotlib.backends.backend_pdf import PdfPages
 from .plotter import Plotter
 
@@ -74,29 +74,24 @@ class DOSPlotter(Plotter):
         variables = self._variables
 
         freq_label = "Frequency ({})".format(variables["freq_unit"])
-        d_freq = variables["d_freq"]
         f_min = variables["f_min"]
         f_max = variables["f_max"]
-        n_freq = int(round((f_max - f_min) / d_freq)) + 1
 
         superscript = '$^{\minus1}$'
         dos_label  = r"Phonon DOS ({}{})".format(variables["freq_unit"], superscript)
         dos_min   = variables["dos_min"]
         dos_max   = variables["dos_max"]
-        dos_ticks = variables["dos_ticks"]
-        # Add 1 to include end points
-        nticks_dos = int(round((dos_max - dos_min) / dos_ticks)) + 1
 
         mlx = AutoMinorLocator(2)
         ax.xaxis.set_minor_locator(mlx)
         mly = AutoMinorLocator(2)
         ax.yaxis.set_minor_locator(mly)
 
-        ax.set_xticks(np.linspace(dos_min, dos_max, nticks_dos))
+        ax.xaxis.set_major_locator(MultipleLocator(variables["dos_ticks"]))
         ax.set_xlabel(dos_label)
         ax.set_xlim(dos_min, dos_max)
 
-        ax.set_yticks(np.linspace(f_min, f_max, n_freq))
+        ax.yaxis.set_major_locator(MultipleLocator(variables["d_freq"]))
         ax.set_ylabel(freq_label)
         ax.set_ylim(f_min, f_max)
 
