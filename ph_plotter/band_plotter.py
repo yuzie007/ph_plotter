@@ -19,6 +19,7 @@ class BandPlotter(Plotter):
 
         self._distances = distances / distances[-1, -1]
         self._frequencies = frequencies
+        print(np.min(frequencies), np.max(frequencies))
 
         band_labels = read_band_labels("band.conf")
         print("band_labels:", band_labels)
@@ -40,7 +41,7 @@ class BandPlotter(Plotter):
         ax.set_xticks([0.0] + list(distances[:, -1]))
         if self._band_labels is not None:
             ax.set_xticklabels(self._band_labels)
-        ax.set_xlabel("Wave vector")
+        ax.set_xlabel("Wavevector")
         ax.set_xlim(distances[0, 0], distances[-1, -1])
 
         ax.set_yticks(np.linspace(f_min, f_max, n_freq))
@@ -54,7 +55,7 @@ class BandPlotter(Plotter):
         # for y in np.linspace(f_min, f_max, n_freq):
         #     ax.axhline(y, color="#000000", linestyle=":")
         # zero axis
-        ax.axhline(0, color="#b0b0b0", linewidth=0.8)
+        ax.axhline(0, color="#b0b0b0", linewidth=0.8, zorder=0)
 
     def plot(self, ax):
         variables = self._variables
