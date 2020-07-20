@@ -55,17 +55,23 @@ def _modify_dashes_by_linewidth(dashes, linewidth):
 
 
 def read_primitive_matrix(phonopy_conf):
-    from phonopy.cui.settings import PhonopyConfParser
-
-    settings = PhonopyConfParser(phonopy_conf, option_list=[]).get_settings()
-    return settings.get_primitive_matrix()
+    from phonopy.cui.settings import fracval
+    with open(phonopy_conf) as f:
+        for line in f.readlines():
+            if 'PRIMITIVE_AXIS' in line:
+                tmp = [
+                    fracval(s) for s in line.split('=')[-1].split()]
+    primitive_matrix = np.array(tmp).reshape(3, 3)
+    return primitive_matrix
 
 
 def read_band_labels(phonopy_conf):
-    from phonopy.cui.settings import PhonopyConfParser
+    band_labels = None
+    with open(phonopy_conf) as f:
+        for line in f.readlines():
+            if 'BAND_LABELS' in line:
+                band_labels = line.split('=')[-1].split()
 
-    settings = PhonopyConfParser(phonopy_conf, option_list=[]).get_settings()
-    band_labels = settings.get_band_labels()
     gamma_str = r"\Gamma"
     if band_labels is not None:
         for i, band_label in enumerate(band_labels):
@@ -125,16 +131,16 @@ class Plotter(object):
     def update_rcParams(self):
         variables = self._variables
 
-        fontsize = variables['fontsize']
-        params = {
-            "font.family": "Arial",
-            "font.size": fontsize,
-            # "mathtext.fontset": "custom",
-            # "mathtext.it": "Arial",
-            "mathtext.default": "regular",
-            "legend.fontsize": fontsize,
-        }
-        plt.rcParams.update(params)
+        # fontsize = variables['fontsize']
+        # params = {
+        #     "font.family": "Arial",
+        #     "font.size": fontsize,
+        #     # "mathtext.fontset": "custom",
+        #     # "mathtext.it": "Arial",
+        #     "mathtext.default": "regular",
+        #     "legend.fontsize": fontsize,
+        # }
+        # plt.rcParams.update(params)
         use_classic_ticks()
         update_prop_cycle(variables['linewidth'])  # This may be not needed for matplotlib 2.x
 
@@ -217,15 +223,7 @@ class Plotter(object):
         return get_primitive(atoms, primitive_matrix)
 
     def _read_primitive_matrix(self):
-        from phonopy.cui.settings import PhonopyConfParser
-        phonopy_conf_parser = PhonopyConfParser(
-            self._conf_file,
-            option_list=[],
-        )
-        primitive_matrix = (
-            phonopy_conf_parser.get_settings().get_primitive_matrix()
-        )
-        return primitive_matrix
+        return read_primitive_matrix(self._conf_file)
 
     def _check_conf_files(self):
         conf_files = [
