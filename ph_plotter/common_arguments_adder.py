@@ -17,6 +17,10 @@ class CommonArgumentsAdder(object):
         parser.add_argument("--d_freq",
                             type=float,
                             help="Pitch for frequency (THz).")
+        parser.add_argument("--dos_max",
+                            default=0.4,
+                            type=float,
+                            help="Maximum DOS (THz^-1).")
         parser.add_argument("--sf_max",
                             default=2.0,
                             type=float,
