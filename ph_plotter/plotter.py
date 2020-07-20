@@ -66,18 +66,44 @@ def read_primitive_matrix(phonopy_conf):
 
 
 def read_band_labels(phonopy_conf):
-    band_labels = None
-    with open(phonopy_conf) as f:
-        for line in f.readlines():
-            if 'BAND_LABELS' in line:
-                band_labels = line.split('=')[-1].split()
+    return BandLabelReader().read(phonopy_conf)
 
-    gamma_str = r"\Gamma"
-    if band_labels is not None:
-        for i, band_label in enumerate(band_labels):
-            band_labels[i] = band_label.replace(gamma_str, u"Γ")
-        band_labels = tuple(band_labels)
-    return band_labels
+
+class BandLabelReader:
+    def read(self, phonopy_conf):
+        import yaml
+        yaml_file = "band.yaml"
+        data = yaml.safe_load(open(yaml_file, "r"))
+        if 'labels' in data:
+            tmp = data['labels']
+            band_labels = []
+            l1_old = ''
+            for i, (l0, l1) in enumerate(tmp):
+                if i == 0:
+                    band_labels.append(l0)
+                elif l0 == l1_old:
+                    band_labels.append(l0)
+                else:
+                    band_labels.append('{}|{}'.format(l1_old, l0))
+                l1_old = l1
+            band_labels.append(l1)
+            return band_labels
+        else:
+            return self.read_from_conf(phonopy_conf)
+
+    def read_from_conf(self, phonopy_conf):
+        band_labels = None
+        with open(phonopy_conf) as f:
+            for line in f.readlines():
+                if 'BAND_LABELS' in line:
+                    band_labels = line.split('=')[-1].split()
+
+        gamma_str = r"\Gamma"
+        if band_labels is not None:
+            for i, band_label in enumerate(band_labels):
+                band_labels[i] = band_label.replace(gamma_str, u"Γ")
+            band_labels = tuple(band_labels)
+        return band_labels
 
 
 class Plotter(object):
