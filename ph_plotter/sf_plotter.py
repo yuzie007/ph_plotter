@@ -101,6 +101,8 @@ class SFPlotter(Plotter):
 
         self._xs = xs / np.nanmax(self._distances)
 
+        self._is_squared = self._check_is_squared(data_file)
+
     @staticmethod
     def _check_is_squared(filename):
         is_squared = True
