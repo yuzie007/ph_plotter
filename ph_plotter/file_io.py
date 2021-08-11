@@ -1,16 +1,10 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-
-__author__ = "Yuji Ikeda"
-
 import numpy as np
 
 
 def read_band_yaml(yaml_file="band.yaml"):
     import yaml
-    data = yaml.load(open(yaml_file, "r"))
+    data = yaml.safe_load(open(yaml_file, "r"))
     nqpoint = data['nqpoint']
     npath = data['npath']
     natom = data['natom']
