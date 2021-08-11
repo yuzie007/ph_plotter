@@ -1,7 +1,7 @@
-from matplotlib import rcParams, mathtext
+from matplotlib import rcParams, _mathtext
 
 # https://qiita.com/ogose/items/d110aa090102079fe73f
-mathtext.FontConstantsBase = mathtext.ComputerModernFontConstants
+_mathtext.FontConstantsBase = _mathtext.ComputerModernFontConstants
 
 rcParams['font.family'] = 'Arial'
 rcParams['mathtext.fontset'] = 'custom'
