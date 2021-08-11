@@ -59,10 +59,9 @@ def read_primitive_matrix(phonopy_conf):
     with open(phonopy_conf) as f:
         for line in f.readlines():
             if 'PRIMITIVE_AXIS' in line:
-                tmp = [
-                    fracval(s) for s in line.split('=')[-1].split()]
-    primitive_matrix = np.array(tmp).reshape(3, 3)
-    return primitive_matrix
+                tmp = [fracval(s) for s in line.split('=')[-1].split()]
+                return np.array(tmp).reshape(3, 3)
+    return np.eye(3)
 
 
 def read_band_labels(phonopy_conf):
