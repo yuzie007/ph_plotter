@@ -71,9 +71,9 @@ def read_band_labels(phonopy_conf):
 class BandLabelReader:
     def read(self, phonopy_conf):
         import yaml
-        yaml_file = "band.yaml"
-        data = yaml.safe_load(open(yaml_file, "r"))
-        if 'labels' in data:
+        try:
+            yaml_file = "band.yaml"
+            data = yaml.safe_load(open(yaml_file, "r"))
             tmp = data['labels']
             band_labels = []
             l1_old = ''
@@ -87,7 +87,7 @@ class BandLabelReader:
                 l1_old = l1
             band_labels.append(l1)
             return band_labels
-        else:
+        except:
             return self.read_from_conf(phonopy_conf)
 
     def read_from_conf(self, phonopy_conf):
